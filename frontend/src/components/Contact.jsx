@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useAuth } from '../store/AuthContext.jsx';
 import axios from 'axios';
 
 const Contact = () => {
+  const { isAuthenticated, user } = useAuth();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -10,6 +12,35 @@ const Contact = () => {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState(null);
+  const [contactData, setContactData] = useState(null);
+
+  useEffect(() => {
+    const fetchContact = async () => {
+      try {
+        if (isAuthenticated && user) {
+          // Fetch logged-in user's contact info
+          const token = localStorage.getItem('token');
+          const headers = { Authorization: `Bearer ${token}` };
+          const res = await axios.get('/api/contact', { headers });
+          setContactData(res.data);
+        } else {
+          // Fetch default/public contact info
+          const res = await axios.get('/api/contact/public');
+          setContactData(res.data);
+        }
+      } catch (error) {
+        console.error('Error fetching contact:', error);
+        // Set default contact if fetch fails
+        setContactData({
+          email: 'your.email@example.com',
+          phone: '+1 (123) 456-7890',
+          location: 'Your City, Country',
+        });
+      }
+    };
+
+    fetchContact();
+  }, [isAuthenticated, user]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -24,7 +55,10 @@ const Contact = () => {
     setIsSubmitting(true);
     
     try {
-      const response = await axios.post('/api/messages', formData);
+      const response = await axios.post('/api/messages', {
+        ...formData,
+        userId: user?._id || 'public'
+      });
       setSubmitStatus({ success: true, message: response.data.message });
       setFormData({
         name: '',
@@ -40,21 +74,33 @@ const Contact = () => {
     } finally {
       setIsSubmitting(false);
       
-      // Clear status message after 5 seconds
       setTimeout(() => {
         setSubmitStatus(null);
       }, 5000);
     }
   };
 
+  if (!contactData) {
+    return (
+      <section id="contact" className="py-20 px-4">
+        <div className="container mx-auto max-w-4xl">
+          <div className="text-center">
+            <div className="loading mx-auto mb-4"></div>
+            <p className="text-slate-400">Loading Contact Information...</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   return (
-    <section id="contact" className="py-20 px-4 bg-gray-900/50">
+    <section id="contact" className="py-20 px-4">
       <div className="container mx-auto max-w-4xl">
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
             Get In <span className="gradient-text">Touch</span>
           </h2>
-          <p className="text-gray-400 max-w-2xl mx-auto">
+          <p className="text-slate-400 max-w-2xl mx-auto">
             Feel free to reach out to me for any questions, opportunities, or just to say hello!
           </p>
         </div>
@@ -62,73 +108,40 @@ const Contact = () => {
         <div className="grid md:grid-cols-2 gap-12">
           <div>
             <h3 className="text-2xl font-semibold mb-6 text-white">Let's Connect</h3>
-            <p className="text-gray-300 mb-8">
+            <p className="text-slate-300 mb-8">
               I'm always interested in hearing about new opportunities and exciting projects. 
               Whether you have a question or just want to say hi, feel free to reach out!
             </p>
             
             <div className="space-y-4">
               <div className="flex items-center space-x-4">
-                <div className="w-12 h-12 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center">
+                <div className="w-12 h-12 bg-blue-500 rounded-lg flex items-center justify-center">
                   <i className="fas fa-envelope text-white"></i>
                 </div>
                 <div>
-                  <p className="text-gray-400 text-sm">Email</p>
-                  <p className="text-white">your.email@example.com</p>
+                  <p className="text-slate-400 text-sm">Email</p>
+                  <p className="text-white">{contactData.email}</p>
                 </div>
               </div>
               
               <div className="flex items-center space-x-4">
-                <div className="w-12 h-12 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center">
+                <div className="w-12 h-12 bg-blue-500 rounded-lg flex items-center justify-center">
                   <i className="fas fa-phone text-white"></i>
                 </div>
                 <div>
-                  <p className="text-gray-400 text-sm">Phone</p>
-                  <p className="text-white">+1 (123) 456-7890</p>
+                  <p className="text-slate-400 text-sm">Phone</p>
+                  <p className="text-white">{contactData.phone}</p>
                 </div>
               </div>
               
               <div className="flex items-center space-x-4">
-                <div className="w-12 h-12 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center">
+                <div className="w-12 h-12 bg-blue-500 rounded-lg flex items-center justify-center">
                   <i className="fas fa-map-marker-alt text-white"></i>
                 </div>
                 <div>
-                  <p className="text-gray-400 text-sm">Location</p>
-                  <p className="text-white">Your City, Country</p>
+                  <p className="text-slate-400 text-sm">Location</p>
+                  <p className="text-white">{contactData.location}</p>
                 </div>
-              </div>
-            </div>
-            
-            <div className="mt-8">
-              <h4 className="text-lg font-medium mb-4 text-white">Follow Me</h4>
-              <div className="flex space-x-4">
-                <a
-                  href="https://github.com/Shivukumar-M"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center text-gray-400 hover:text-white hover:bg-gray-700 transition-all duration-300"
-                  aria-label="GitHub"
-                >
-                  <i className="fab fa-github"></i>
-                </a>
-                <a
-                  href="#"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center text-gray-400 hover:text-white hover:bg-gray-700 transition-all duration-300"
-                  aria-label="LinkedIn"
-                >
-                  <i className="fab fa-linkedin"></i>
-                </a>
-                <a
-                  href="#"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center text-gray-400 hover:text-white hover:bg-gray-700 transition-all duration-300"
-                  aria-label="Twitter"
-                >
-                  <i className="fab fa-twitter"></i>
-                </a>
               </div>
             </div>
           </div>
@@ -136,7 +149,7 @@ const Contact = () => {
           <div>
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
-                <label htmlFor="name" className="block text-sm font-medium text-gray-300 mb-2">
+                <label htmlFor="name" className="block text-sm font-medium text-slate-300 mb-2">
                   Your Name
                 </label>
                 <input
@@ -146,13 +159,13 @@ const Contact = () => {
                   value={formData.name}
                   onChange={handleChange}
                   required
-                  className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:border-indigo-500 text-white transition-colors duration-300"
+                  className="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:border-blue-500 text-white transition-colors duration-300"
                   placeholder="John Doe"
                 />
               </div>
               
               <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
+                <label htmlFor="email" className="block text-sm font-medium text-slate-300 mb-2">
                   Your Email
                 </label>
                 <input
@@ -162,13 +175,13 @@ const Contact = () => {
                   value={formData.email}
                   onChange={handleChange}
                   required
-                  className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:border-indigo-500 text-white transition-colors duration-300"
+                  className="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:border-blue-500 text-white transition-colors duration-300"
                   placeholder="john@example.com"
                 />
               </div>
               
               <div>
-                <label htmlFor="subject" className="block text-sm font-medium text-gray-300 mb-2">
+                <label htmlFor="subject" className="block text-sm font-medium text-slate-300 mb-2">
                   Subject
                 </label>
                 <input
@@ -178,13 +191,13 @@ const Contact = () => {
                   value={formData.subject}
                   onChange={handleChange}
                   required
-                  className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:border-indigo-500 text-white transition-colors duration-300"
+                  className="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:border-blue-500 text-white transition-colors duration-300"
                   placeholder="Project Inquiry"
                 />
               </div>
               
               <div>
-                <label htmlFor="message" className="block text-sm font-medium text-gray-300 mb-2">
+                <label htmlFor="message" className="block text-sm font-medium text-slate-300 mb-2">
                   Message
                 </label>
                 <textarea
@@ -194,7 +207,7 @@ const Contact = () => {
                   onChange={handleChange}
                   required
                   rows="5"
-                  className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:border-indigo-500 text-white resize-none transition-colors duration-300"
+                  className="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:border-blue-500 text-white resize-none transition-colors duration-300"
                   placeholder="Your message here..."
                 ></textarea>
               </div>
@@ -202,7 +215,7 @@ const Contact = () => {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full px-6 py-3 bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-medium rounded-lg hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isSubmitting ? (
                   <span className="flex items-center justify-center">
@@ -219,10 +232,10 @@ const Contact = () => {
             </form>
             
             {submitStatus && (
-              <div className={`mt-4 p-4 rounded-lg ${
+              <div className={`mt-4 p-4 rounded-lg border ${
                 submitStatus.success 
-                  ? 'bg-green-900/30 border border-green-500/30 text-green-400' 
-                  : 'bg-red-900/30 border border-red-500/30 text-red-400'
+                  ? 'bg-green-900/20 border-green-500/30 text-green-400' 
+                  : 'bg-red-900/20 border-red-500/30 text-red-400'
               }`}>
                 {submitStatus.success ? '✓' : '✗'} {submitStatus.message}
               </div>

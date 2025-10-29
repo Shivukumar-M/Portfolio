@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import { useAuth } from '../store/AuthContext.jsx';
+import axios from 'axios';
 
 const Hero = () => {
+  const { isAuthenticated, user } = useAuth();
+  const [profileData, setProfileData] = useState(null);
   const [text, setText] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
   const [loopNum, setLoopNum] = useState(0);
@@ -12,6 +16,42 @@ const Hero = () => {
     'Problem Solver',
     'Tech Enthusiast'
   ];
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        if (isAuthenticated && user) {
+          // Fetch logged-in user's profile
+          const token = localStorage.getItem('token');
+          const headers = { Authorization: `Bearer ${token}` };
+          const res = await axios.get('/api/profile', { headers });
+          setProfileData(res.data);
+        } else {
+          // Fetch default/public profile
+          const res = await axios.get('/api/profile/public');
+          setProfileData(res.data);
+        }
+      } catch (error) {
+        console.error('Error fetching profile:', error);
+        // Set default data if fetch fails
+        setProfileData({
+          profile: {
+            name: 'Shivukumar M',
+            title: 'Full Stack Developer',
+            bio: 'Passionate about creating elegant solutions to complex problems. Specializing in modern web technologies with a focus on user experience and clean code.',
+            photo: './image/g',
+            social: {
+              github: 'https://github.com/Shivukumar-M',
+              linkedin: '#',
+              twitter: '#',
+            }
+          }
+        });
+      }
+    };
+
+    fetchProfile();
+  }, [isAuthenticated, user]);
 
   useEffect(() => {
     const handleType = () => {
@@ -37,11 +77,20 @@ const Hero = () => {
     return () => clearTimeout(timer);
   }, [text, isDeleting, loopNum, typingSpeed]);
 
-  const socialLinks = [
-    { name: 'GitHub', icon: 'fab fa-github', url: 'https://github.com/Shivukumar-M' },
-    { name: 'LinkedIn', icon: 'fab fa-linkedin', url: '#' },
-    { name: 'Twitter', icon: 'fab fa-twitter', url: '#' },
-  ];
+  if (!profileData) {
+    return (
+      <section id="home" className="min-h-screen flex items-center pt-20">
+        <div className="container mx-auto px-4">
+          <div className="text-center">
+            <div className="loading mx-auto mb-4"></div>
+            <p className="text-slate-400">Loading Profile...</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  const { profile } = profileData;
 
   return (
     <section id="home" className="min-h-screen flex items-center pt-20">
@@ -49,45 +98,59 @@ const Hero = () => {
         <div className="grid md:grid-cols-2 gap-12 items-center">
           <div className="fade-in">
             <h1 className="text-4xl md:text-6xl font-bold mb-4">
-              Hi, I'm <span className="gradient-text">Shivukumar M</span>
+              Hi, I'm <span className="gradient-text">{profile.name}</span>
             </h1>
-            <h2 className="text-2xl md:text-3xl font-medium mb-6 text-gray-300">
-              I'm a <span className="text-indigo-400">{text}</span>
+            <h2 className="text-2xl md:text-3xl font-medium mb-6 text-slate-300">
+              I'm a <span className="text-blue-400">{text}</span>
               <span className="animate-pulse">|</span>
             </h2>
-            <p className="text-lg text-gray-400 mb-8 max-w-lg">
-              Passionate about creating elegant solutions to complex problems. 
-              Specializing in modern web technologies with a focus on user experience and clean code.
+            <p className="text-lg text-slate-400 mb-8 max-w-lg">
+              {profile.bio}
             </p>
             
             <div className="flex flex-wrap gap-4 mb-8">
               <a
                 href="#projects"
-                className="px-6 py-3 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-lg hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300"
+                className="btn-primary"
               >
                 View My Work
               </a>
               <a
                 href="#contact"
-                className="px-6 py-3 border border-gray-600 text-white rounded-lg hover:bg-gray-800 transition-all duration-300"
+                className="btn-secondary"
               >
                 Contact Me
               </a>
             </div>
 
             <div className="flex space-x-4">
-              {socialLinks.map((link) => (
-                <a
-                  key={link.name}
-                  href={link.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center text-gray-400 hover:text-white hover:bg-gray-700 transition-all duration-300"
-                  aria-label={link.name}
-                >
-                  <i className={link.icon}></i>
-                </a>
-              ))}
+              <a
+                href={profile.social.github}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-10 h-10 bg-slate-800 rounded-full flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-700 transition-all duration-300"
+                aria-label="GitHub"
+              >
+                <i className="fab fa-github"></i>
+              </a>
+              <a
+                href={profile.social.linkedin}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-10 h-10 bg-slate-800 rounded-full flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-700 transition-all duration-300"
+                aria-label="LinkedIn"
+              >
+                <i className="fab fa-linkedin"></i>
+              </a>
+              <a
+                href={profile.social.twitter}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-10 h-10 bg-slate-800 rounded-full flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-700 transition-all duration-300"
+                aria-label="Twitter"
+              >
+                <i className="fab fa-twitter"></i>
+              </a>
             </div>
           </div>
           
@@ -95,12 +158,12 @@ const Hero = () => {
             <div className="relative floating">
               <div className="w-80 h-80 rounded-2xl overflow-hidden glow">
                 <img
-                  src="https://via.placeholder.com/400x400/111827/6366f1?text=Your+Photo"
+                  src={profile.photo}
                   alt="Profile"
                   className="w-full h-full object-cover"
                 />
               </div>
-              <div className="absolute -bottom-6 -right-6 w-24 h-24 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-xl">
+              <div className="absolute -bottom-6 -right-6 w-24 h-24 bg-blue-500 rounded-2xl flex items-center justify-center shadow-xl">
                 <i className="fas fa-code text-white text-2xl"></i>
               </div>
             </div>

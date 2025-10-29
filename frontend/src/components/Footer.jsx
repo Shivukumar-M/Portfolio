@@ -18,18 +18,18 @@ const Footer = () => {
   ];
 
   return (
-    <footer className="bg-gray-900 border-t border-gray-800 py-12 px-4">
+    <footer className="bg-slate-900 border-t border-slate-800 py-12 px-4">
       <div className="container mx-auto max-w-6xl">
         <div className="grid md:grid-cols-4 gap-8">
           {/* Brand */}
           <div>
             <div className="flex items-center space-x-2 mb-4">
-              <div className="w-10 h-10 rounded-lg bg-gradient-to-r from-indigo-500 to-purple-600 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-lg bg-blue-500 flex items-center justify-center">
                 <span className="text-white font-bold text-xl">S</span>
               </div>
               <span className="text-xl font-bold text-white">Shivukumar</span>
             </div>
-            <p className="text-gray-400 text-sm">
+            <p className="text-slate-400 text-sm">
               Full Stack Developer passionate about creating elegant solutions to complex problems.
             </p>
           </div>
@@ -42,7 +42,7 @@ const Footer = () => {
                 <li key={link.name}>
                   <a
                     href={link.href}
-                    className="text-gray-400 hover:text-white transition-colors duration-300"
+                    className="text-slate-400 hover:text-white transition-colors duration-300"
                   >
                     {link.name}
                   </a>
@@ -55,10 +55,10 @@ const Footer = () => {
           <div>
             <h3 className="text-lg font-semibold mb-4 text-white">Services</h3>
             <ul className="space-y-2">
-              <li className="text-gray-400">Web Development</li>
-              <li className="text-gray-400">UI/UX Design</li>
-              <li className="text-gray-400">API Development</li>
-              <li className="text-gray-400">Database Design</li>
+              <li className="text-slate-400">Web Development</li>
+              <li className="text-slate-400">UI/UX Design</li>
+              <li className="text-slate-400">API Development</li>
+              <li className="text-slate-400">Database Design</li>
             </ul>
           </div>
           
@@ -72,24 +72,24 @@ const Footer = () => {
                   href={link.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center text-gray-400 hover:text-white hover:bg-gray-700 transition-all duration-300"
+                  className="w-10 h-10 bg-slate-800 rounded-full flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-700 transition-all duration-300 border border-slate-700"
                   aria-label={link.name}
                 >
                   <i className={link.icon}></i>
                 </a>
               ))}
             </div>
-            <p className="text-gray-400 text-sm">
+            <p className="text-slate-400 text-sm">
               your.email@example.com
             </p>
           </div>
         </div>
         
-        <div className="mt-12 pt-8 border-t border-gray-800 flex flex-col md:flex-row justify-between items-center">
-          <p className="text-gray-400 text-sm mb-4 md:mb-0">
+        <div className="mt-12 pt-8 border-t border-slate-800 flex flex-col md:flex-row justify-between items-center">
+          <p className="text-slate-400 text-sm mb-4 md:mb-0">
             © {currentYear} Shivukumar M. All rights reserved.
           </p>
-          <p className="text-gray-400 text-sm">
+          <p className="text-slate-400 text-sm">
             Built with React, Node.js, Express, and MongoDB
           </p>
         </div>

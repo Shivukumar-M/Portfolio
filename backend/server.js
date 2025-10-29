@@ -2,8 +2,8 @@ const express = require('express');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const cors = require('cors');
-const projectRoutes = require('./routes/projects');
-const messageRoutes = require('./routes/messages');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
 // Load environment variables
 dotenv.config();
@@ -16,12 +16,34 @@ app.use(cors());
 app.use(express.json());
 
 // Database connection
-const connectDB = require('./config/db');
+const connectDB = async () => {
+  try {
+    const conn = await mongoose.connect(process.env.MONGO_URI);
+    console.log(`MongoDB Connected: ${conn.connection.host}`);
+  } catch (error) {
+    console.error(`Error: ${error.message}`);
+    process.exit(1);
+  }
+};
+
 connectDB();
 
+// Import routes
+const authRoutes = require('./routes/auth');
+const profileRoutes = require('./routes/profile');
+const skillsRoutes = require('./routes/skills');
+const projectsRoutes = require('./routes/projects');
+const contactRoutes = require('./routes/contact');
+const messagesRoutes = require('./routes/messages');
+
 // Routes
-app.use('/api/projects', projectRoutes);
-app.use('/api/messages', messageRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/profile', profileRoutes);
+app.use('/api/skills', skillsRoutes);
+app.use('/api/projects', projectsRoutes);
+app.use('/api/contact', contactRoutes);
+app.use('/api/messages', messagesRoutes);
+
 
 // Default route
 app.get('/', (req, res) => {
