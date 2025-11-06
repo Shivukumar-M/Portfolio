@@ -67,25 +67,40 @@ export const AuthProvider = ({ children }) => {
   };
 
   // Load user
-  const loadUser = async () => {
-    if (localStorage.token) {
-      setAuthToken(localStorage.token);
-    }
+ const loadUser = async () => {
+  if (localStorage.token) {
+    setAuthToken(localStorage.token);
+  }
 
+  try {
+    // Try to load private profile first
+    const res = await axios.get('/api/profile');
+    dispatch({
+      type: 'LOGIN_SUCCESS',
+      payload: {
+        user: res.data,
+        token: localStorage.token,
+      },
+    });
+  } catch (error) {
+    console.warn('Falling back to public profile...');
     try {
-      const res = await axios.get('/api/profile');
+      // If private fails, use public profile
+      const res = await axios.get('http://localhost:5000/api/profile/public');
       dispatch({
         type: 'LOGIN_SUCCESS',
         payload: {
-          user: res.data,
-          token: localStorage.token,
+          user: res.data.profile,
+          token: null, // public mode has no token
         },
       });
-    } catch (error) {
-      console.error('Load user error:', error);
-      dispatch({ type: 'AUTH_ERROR', payload: error.response?.data?.message || 'Server Error' });
+    } catch (publicErr) {
+      console.error('Public profile fetch error:', publicErr);
+      dispatch({ type: 'AUTH_ERROR', payload: 'Unable to load profile' });
     }
-  };
+  }
+};
+
 
   // Login
   const login = async (email, password) => {

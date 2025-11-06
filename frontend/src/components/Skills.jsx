@@ -7,37 +7,25 @@ const Skills = () => {
   const [skills, setSkills] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState('all');
-  
+
   const categories = ['all', 'frontend', 'backend', 'tools'];
 
   useEffect(() => {
     const fetchSkills = async () => {
       try {
         if (isAuthenticated && user) {
-          // Fetch logged-in user's skills
           const token = localStorage.getItem('token');
           const headers = { Authorization: `Bearer ${token}` };
           const res = await axios.get('/api/skills', { headers });
           setSkills(res.data);
         } else {
-          // Fetch default/public skills
-          const res = await axios.get('/api/skills/public');
+          const res = await axios.get('http://localhost:5000/api/skills/public');
           setSkills(res.data);
         }
-        setLoading(false);
       } catch (error) {
         console.error('Error fetching skills:', error);
-        // Set default skills if fetch fails
-        setSkills([
-          { name: 'JavaScript', level: 90, icon: 'fab fa-js', color: 'bg-yellow-500', category: 'frontend' },
-          { name: 'React', level: 85, icon: 'fab fa-react', color: 'bg-blue-500', category: 'frontend' },
-          { name: 'Node.js', level: 80, icon: 'fab fa-node', color: 'bg-green-500', category: 'backend' },
-          { name: 'MongoDB', level: 75, icon: 'fas fa-database', color: 'bg-green-600', category: 'backend' },
-          { name: 'HTML/CSS', level: 90, icon: 'fab fa-html5', color: 'bg-orange-500', category: 'frontend' },
-          { name: 'Git', level: 80, icon: 'fab fa-git-alt', color: 'bg-red-500', category: 'tools' },
-          { name: 'Express.js', level: 75, icon: 'fas fa-server', color: 'bg-slate-500', category: 'backend' },
-          { name: 'Tailwind CSS', level: 85, icon: 'fas fa-wind', color: 'bg-cyan-500', category: 'frontend' },
-        ]);
+        setSkills([]);
+      } finally {
         setLoading(false);
       }
     };
@@ -45,18 +33,16 @@ const Skills = () => {
     fetchSkills();
   }, [isAuthenticated, user]);
 
-  const displayedSkills = activeCategory === 'all' 
-    ? skills 
-    : skills.filter(skill => skill.category === activeCategory);
+  const displayedSkills =
+    activeCategory === 'all'
+      ? skills
+      : skills.filter((skill) => skill.category === activeCategory);
 
   if (loading) {
     return (
       <section id="skills" className="py-20 px-4">
-        <div className="container mx-auto max-w-6xl">
-          <div className="text-center">
-            <div className="loading mx-auto mb-4"></div>
-            <p className="text-slate-400">Loading Skills...</p>
-          </div>
+        <div className="container mx-auto max-w-6xl text-center">
+          <p className="text-slate-400">Loading Skills...</p>
         </div>
       </section>
     );
@@ -73,7 +59,7 @@ const Skills = () => {
             Technologies and tools I work with to bring ideas to life
           </p>
         </div>
-        
+
         {/* Category Filter */}
         <div className="flex justify-center mb-12">
           <div className="bg-slate-800 rounded-lg p-1 flex border border-slate-700">
@@ -92,25 +78,41 @@ const Skills = () => {
             ))}
           </div>
         </div>
-        
+
         {/* Skills Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
           {displayedSkills.map((skill, index) => (
             <div
-              key={index}
+              key={skill._id || `${skill.name}-${index}`}
               className="bg-slate-800 rounded-lg p-6 text-center card-hover border border-slate-700"
             >
-              <div className={`w-16 h-16 ${skill.color} rounded-full flex items-center justify-center mx-auto mb-4`}>
-                <i className={`${skill.icon} text-white text-2xl`}></i>
+              <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 bg-slate-700 overflow-hidden">
+                {skill.icon?.includes('/images/') ? (
+                  <img
+                    src={skill.icon}
+                    alt={skill.name}
+                    className="w-12 h-12 object-contain"
+                  />
+                ) : (
+                  <i
+                    className={`${skill.icon || 'fas fa-cogs'} text-white text-2xl`}
+                  ></i>
+                )}
               </div>
-              <h3 className="text-lg font-medium text-white mb-2">{skill.name}</h3>
+              <h3 className="text-lg font-medium text-white mb-2">
+                {skill.name}
+              </h3>
               <div className="w-full bg-slate-700 rounded-full h-2 mb-2">
                 <div
                   className="h-2 rounded-full bg-blue-500"
-                  style={{ width: `${skill.level}%` }}
+                  style={{
+                    width: `${skill.level || 80}%`,
+                  }}
                 ></div>
               </div>
-              <span className="text-sm text-slate-400">{skill.level}%</span>
+              <span className="text-sm text-slate-400">
+                {skill.level ? `${skill.level}%` : 'Skill'}
+              </span>
             </div>
           ))}
         </div>

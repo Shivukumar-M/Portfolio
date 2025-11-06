@@ -14,39 +14,40 @@ const Hero = () => {
     'Full Stack Developer',
     'MERN Specialist',
     'Problem Solver',
-    'Tech Enthusiast'
+    'Tech Enthusiast',
   ];
 
   useEffect(() => {
     const fetchProfile = async () => {
+      // Show default data first (so page never stays blank)
+      setProfileData({
+        profile: {
+          name: 'Shivukumar M',
+          title: 'Full Stack Developer',
+          bio: 'Passionate about creating elegant solutions to complex problems. Specializing in modern web technologies with a focus on user experience and clean code.',
+          photo: './images/github.jpg',
+          social: {
+            github: 'https://github.com/Shivukumar-M',
+            linkedin: 'https://www.linkedin.com/in/shivu-kumar-a-m',
+            twitter: '#',
+          },
+        },
+      });
+
       try {
         if (isAuthenticated && user) {
-          // Fetch logged-in user's profile
+          // Logged-in user's private profile
           const token = localStorage.getItem('token');
           const headers = { Authorization: `Bearer ${token}` };
           const res = await axios.get('/api/profile', { headers });
-          setProfileData(res.data);
+          if (res.data) setProfileData(res.data);
         } else {
-          // Fetch default/public profile
-          const res = await axios.get('/api/profile/public');
-          setProfileData(res.data);
+          // Public or guest profile
+          const res = await axios.get('http://localhost:5000/api/profile/public');
+          if (res.data) setProfileData(res.data);
         }
       } catch (error) {
-        console.error('Error fetching profile:', error);
-        // Set default data if fetch fails
-        setProfileData({
-          profile: {
-            name: 'Shivukumar M',
-            title: 'Full Stack Developer',
-            bio: 'Passionate about creating elegant solutions to complex problems. Specializing in modern web technologies with a focus on user experience and clean code.',
-            photo: './image/g',
-            social: {
-              github: 'https://github.com/Shivukumar-M',
-              linkedin: '#',
-              twitter: '#',
-            }
-          }
-        });
+        console.warn('Using default profile — API unreachable or user not logged in.');
       }
     };
 
@@ -58,9 +59,10 @@ const Hero = () => {
       const i = loopNum % roles.length;
       const fullText = roles[i];
 
-      setText(isDeleting 
-        ? fullText.substring(0, text.length - 1) 
-        : fullText.substring(0, text.length + 1)
+      setText(
+        isDeleting
+          ? fullText.substring(0, text.length - 1)
+          : fullText.substring(0, text.length + 1)
       );
 
       setTypingSpeed(isDeleting ? 30 : 150);
@@ -96,6 +98,7 @@ const Hero = () => {
     <section id="home" className="min-h-screen flex items-center pt-20">
       <div className="container mx-auto px-4">
         <div className="grid md:grid-cols-2 gap-12 items-center">
+          {/* LEFT CONTENT */}
           <div className="fade-in">
             <h1 className="text-4xl md:text-6xl font-bold mb-4">
               Hi, I'm <span className="gradient-text">{profile.name}</span>
@@ -104,21 +107,13 @@ const Hero = () => {
               I'm a <span className="text-blue-400">{text}</span>
               <span className="animate-pulse">|</span>
             </h2>
-            <p className="text-lg text-slate-400 mb-8 max-w-lg">
-              {profile.bio}
-            </p>
-            
+            <p className="text-lg text-slate-400 mb-8 max-w-lg">{profile.bio}</p>
+
             <div className="flex flex-wrap gap-4 mb-8">
-              <a
-                href="#projects"
-                className="btn-primary"
-              >
+              <a href="#projects" className="btn-primary">
                 View My Work
               </a>
-              <a
-                href="#contact"
-                className="btn-secondary"
-              >
+              <a href="#contact" className="btn-secondary">
                 Contact Me
               </a>
             </div>
@@ -153,7 +148,8 @@ const Hero = () => {
               </a>
             </div>
           </div>
-          
+
+          {/* RIGHT PROFILE IMAGE */}
           <div className="flex justify-center">
             <div className="relative floating">
               <div className="w-80 h-80 rounded-2xl overflow-hidden glow">

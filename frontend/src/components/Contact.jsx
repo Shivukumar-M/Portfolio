@@ -25,7 +25,7 @@ const Contact = () => {
           setContactData(res.data);
         } else {
           // Fetch default/public contact info
-          const res = await axios.get('/api/contact/public');
+          const res = await axios.get('http://localhost:5000/api/contact/public');
           setContactData(res.data);
         }
       } catch (error) {
@@ -160,7 +160,7 @@ const Contact = () => {
                   onChange={handleChange}
                   required
                   className="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:border-blue-500 text-white transition-colors duration-300"
-                  placeholder="John Doe"
+                  placeholder="Shivu Kumar"
                 />
               </div>
               
@@ -176,7 +176,7 @@ const Contact = () => {
                   onChange={handleChange}
                   required
                   className="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:border-blue-500 text-white transition-colors duration-300"
-                  placeholder="john@example.com"
+                  placeholder="dark@example.com"
                 />
               </div>
               

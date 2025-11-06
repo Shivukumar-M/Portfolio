@@ -8,53 +8,58 @@ const Projects = () => {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
 
+  // Default (public) projects
+  const defaultProjects = [
+    {
+      _id: 'p1',
+      title: 'Blog Platform',
+      description:
+        'A modern blogging platform built with Django, Tailwind CSS, and JavaScript. Allows users to create, edit, and publish blog posts with a beautiful responsive UI.',
+      image: '/images/blog.png',
+      githubLink: 'https://github.com/Shivukumar-M/blog-platform',
+      liveDemo: 'https://blog-demo.vercel.app',
+      technologies: ['Django', 'Tailwind CSS', 'JavaScript', 'HTML'],
+    },
+    {
+      _id: 'p2',
+      title: 'Gemini AI Bot',
+      description:
+        'An intelligent chatbot powered by Python Flask and Gemini API, featuring natural language understanding and a responsive Tailwind UI.',
+      image: '/images/ai.png',
+      githubLink: 'https://github.com/Shivukumar-M/gemini-ai-bot',
+      liveDemo: 'https://gemini-bot-demo.vercel.app',
+      technologies: ['Python', 'Flask', 'Tailwind CSS', 'JavaScript'],
+    },
+    {
+      _id: 'p3',
+      title: 'Portfolio Website',
+      description:
+        'A personal portfolio built with the MERN stack to showcase projects, skills, and contact information with a smooth UI and admin panel.',
+      image: '/images/portfolio.png',
+      githubLink: 'https://github.com/Shivukumar-M/mern-portfolio',
+      liveDemo: 'https://portfolio-demo.vercel.app',
+      technologies: ['MongoDB', 'Express', 'React', 'Node.js'],
+    },
+  ];
+
   useEffect(() => {
     const fetchProjects = async () => {
       try {
         if (isAuthenticated && user) {
-          // Fetch logged-in user's projects
+          // Authenticated user's projects
           const token = localStorage.getItem('token');
           const headers = { Authorization: `Bearer ${token}` };
           const res = await axios.get('/api/projects', { headers });
           setProjects(res.data);
         } else {
-          // Fetch default/public projects
-          const res = await axios.get('/api/projects/public');
-          setProjects(res.data);
+          // Public/default projects
+          const res = await axios.get('http://localhost:5000/api/projects/public');
+          setProjects(res.data.length ? res.data : defaultProjects);
         }
-        setLoading(false);
       } catch (error) {
         console.error('Error fetching projects:', error);
-        // Set default projects if fetch fails
-        setProjects([
-          {
-            _id: '1',
-            title: 'E-commerce Platform',
-            description: 'A full-stack e-commerce platform with user authentication, payment processing, and admin dashboard.',
-            image: 'https://via.placeholder.com/600x400/1e293b/3b82f6?text=E-commerce+Platform',
-            githubLink: 'https://github.com/Shivukumar-M/ecommerce-platform',
-            liveDemo: 'https://ecommerce-demo.vercel.app',
-            technologies: ['React', 'Node.js', 'MongoDB', 'Stripe'],
-          },
-          {
-            _id: '2',
-            title: 'Task Management App',
-            description: 'A collaborative task management application with real-time updates and team collaboration features.',
-            image: 'https://via.placeholder.com/600x400/1e293b/3b82f6?text=Task+Management',
-            githubLink: 'https://github.com/Shivukumar-M/task-manager',
-            liveDemo: 'https://task-manager-demo.vercel.app',
-            technologies: ['React', 'Node.js', 'Express', 'Socket.io'],
-          },
-          {
-            _id: '3',
-            title: 'Weather Dashboard',
-            description: 'A responsive weather dashboard that displays current weather and forecasts for multiple locations.',
-            image: 'https://via.placeholder.com/600x400/1e293b/3b82f6?text=Weather+Dashboard',
-            githubLink: 'https://github.com/Shivukumar-M/weather-dashboard',
-            liveDemo: 'https://weather-dashboard-demo.vercel.app',
-            technologies: ['React', 'API Integration', 'Chart.js', 'Tailwind CSS'],
-          },
-        ]);
+        setProjects(defaultProjects);
+      } finally {
         setLoading(false);
       }
     };
@@ -62,20 +67,23 @@ const Projects = () => {
     fetchProjects();
   }, [isAuthenticated, user]);
 
-  const filteredProjects = filter === 'all' 
-    ? projects 
-    : projects.filter(project => project.technologies.includes(filter));
+  const filteredProjects =
+    filter === 'all'
+      ? projects
+      : projects.filter((project) =>
+          project.technologies.some(
+            (tech) => tech.toLowerCase() === filter.toLowerCase()
+          )
+        );
 
-  const techFilters = ['all', 'React', 'Node.js', 'MongoDB', 'JavaScript'];
+  const techFilters = ['all', 'React', 'Node.js', 'Python', 'Django', 'Tailwind CSS', 'JavaScript'];
 
   if (loading) {
     return (
       <section id="projects" className="py-20 px-4">
-        <div className="container mx-auto max-w-6xl">
-          <div className="text-center">
-            <div className="loading mx-auto mb-4"></div>
-            <p className="text-slate-400">Loading Projects...</p>
-          </div>
+        <div className="container mx-auto max-w-6xl text-center">
+          <div className="loading mx-auto mb-4"></div>
+          <p className="text-slate-400">Loading Projects...</p>
         </div>
       </section>
     );
@@ -92,15 +100,15 @@ const Projects = () => {
             Explore my recent work and personal projects
           </p>
         </div>
-        
-        {/* Filter Tags */}
+
+        {/* Filter Buttons */}
         <div className="flex justify-center mb-12">
-          <div className="bg-slate-800 rounded-lg p-1 flex border border-slate-700">
+          <div className="bg-slate-800 rounded-lg p-1 flex border border-slate-700 flex-wrap justify-center">
             {techFilters.map((tech) => (
               <button
                 key={tech}
                 onClick={() => setFilter(tech)}
-                className={`px-4 py-2 rounded-md capitalize transition-all duration-300 ${
+                className={`px-4 py-2 m-1 rounded-md capitalize transition-all duration-300 ${
                   filter === tech
                     ? 'bg-blue-500 text-white'
                     : 'text-slate-400 hover:text-white'
@@ -114,13 +122,13 @@ const Projects = () => {
 
         {filteredProjects.length === 0 ? (
           <div className="text-center text-slate-400 py-12">
-            <p>No projects found matching filter: {filter}</p>
+            <p>No projects found matching: {filter}</p>
           </div>
         ) : (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {filteredProjects.map((project) => (
               <div
-                key={project._id}
+                key={project._id || project.title}
                 className="bg-slate-800 rounded-lg overflow-hidden card-hover border border-slate-700"
               >
                 <div className="h-48 overflow-hidden">
@@ -131,25 +139,22 @@ const Projects = () => {
                   />
                 </div>
                 <div className="p-6">
-                  <h3 className="text-xl font-semibold mb-2 text-white">{project.title}</h3>
+                  <h3 className="text-xl font-semibold mb-2 text-white">
+                    {project.title}
+                  </h3>
                   <p className="text-slate-400 mb-4">{project.description}</p>
-                  
+
                   <div className="flex flex-wrap gap-2 mb-4">
-                    {project.technologies.slice(0, 3).map((tech, i) => (
+                    {project.technologies.map((tech, i) => (
                       <span
-                        key={i}
+                        key={`${project._id}-${tech}-${i}`}
                         className="px-2 py-1 bg-slate-700 rounded text-xs text-slate-300"
                       >
                         {tech}
                       </span>
                     ))}
-                    {project.technologies.length > 3 && (
-                      <span className="px-2 py-1 bg-slate-700 rounded text-xs text-slate-300">
-                        +{project.technologies.length - 3} more
-                      </span>
-                    )}
                   </div>
-                  
+
                   <div className="flex justify-between">
                     <a
                       href={project.githubLink}
@@ -157,8 +162,7 @@ const Projects = () => {
                       rel="noopener noreferrer"
                       className="flex items-center text-blue-400 hover:text-blue-300 transition-colors duration-300"
                     >
-                      <i className="fab fa-github mr-2"></i>
-                      Code
+                      <i className="fab fa-github mr-2"></i> Code
                     </a>
                     <a
                       href={project.liveDemo}
@@ -166,8 +170,7 @@ const Projects = () => {
                       rel="noopener noreferrer"
                       className="flex items-center text-blue-400 hover:text-blue-300 transition-colors duration-300"
                     >
-                      <i className="fas fa-external-link-alt mr-2"></i>
-                      Live Demo
+                      <i className="fas fa-external-link-alt mr-2"></i> Live Demo
                     </a>
                   </div>
                 </div>
