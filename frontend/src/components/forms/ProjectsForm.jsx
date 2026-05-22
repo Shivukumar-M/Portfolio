@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import ReactMarkdown from 'react-markdown';
 
 const ProjectsForm = ({ projectsData, setProjectsData }) => {
   const [projects, setProjects] = useState([]);
@@ -10,11 +11,13 @@ const ProjectsForm = ({ projectsData, setProjectsData }) => {
     githubLink: '',
     liveDemo: '',
     technologies: '',
+    content: '',
   });
   const [editingId, setEditingId] = useState(null);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
+  const [mdTab, setMdTab] = useState('write');
 
   useEffect(() => {
     setProjects(projectsData);
@@ -41,6 +44,7 @@ const ProjectsForm = ({ projectsData, setProjectsData }) => {
       const projectData = {
         ...formData,
         technologies: formData.technologies.split(',').map(tech => tech.trim()),
+        content: formData.content,
       };
       
       let res;
@@ -73,8 +77,10 @@ const ProjectsForm = ({ projectsData, setProjectsData }) => {
       githubLink: project.githubLink,
       liveDemo: project.liveDemo,
       technologies: project.technologies.join(', '),
+      content: project.content || '',
     });
     setEditingId(project._id);
+    setMdTab('write');
   };
 
   const handleDelete = async (id) => {
@@ -101,8 +107,10 @@ const ProjectsForm = ({ projectsData, setProjectsData }) => {
       githubLink: '',
       liveDemo: '',
       technologies: '',
+      content: '',
     });
     setEditingId(null);
+    setMdTab('write');
   };
 
   return (
@@ -234,6 +242,40 @@ const ProjectsForm = ({ projectsData, setProjectsData }) => {
               />
             </div>
             
+            {/* Markdown Case Study */}
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <label className="block text-sm font-medium text-slate-300">
+                  Case Study <span className="text-slate-500 font-normal">(Markdown supported)</span>
+                </label>
+                <div className="flex text-xs rounded-lg overflow-hidden border border-slate-600">
+                  {['write', 'preview'].map(t => (
+                    <button key={t} type="button" onClick={() => setMdTab(t)}
+                      className={`px-3 py-1 capitalize transition-colors ${mdTab === t ? 'bg-blue-600 text-white' : 'bg-slate-700 text-slate-400 hover:text-white'}`}>
+                      {t}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              {mdTab === 'write' ? (
+                <textarea
+                  name="content"
+                  value={formData.content}
+                  onChange={handleChange}
+                  rows="10"
+                  className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-lg focus:outline-none focus:border-blue-500 text-white font-mono text-sm resize-y transition-colors duration-300"
+                  placeholder={`## Overview\nDescribe the problem this project solves...\n\n## Tech Stack\n- React for the frontend\n- Node.js + Express for the API\n\n## Challenges\nWhat was hard and how you solved it...`}
+                />
+              ) : (
+                <div className="min-h-[200px] px-4 py-3 bg-slate-800 border border-slate-600 rounded-lg prose prose-invert prose-sm max-w-none prose-p:text-slate-300 prose-headings:text-white prose-code:text-green-300 prose-code:bg-slate-700 prose-code:px-1 prose-code:rounded prose-li:text-slate-300">
+                  {formData.content
+                    ? <ReactMarkdown>{formData.content}</ReactMarkdown>
+                    : <p className="text-slate-500 italic">Nothing to preview yet.</p>
+                  }
+                </div>
+              )}
+            </div>
+
             <div className="flex space-x-4">
               <button
                 type="submit"
@@ -320,23 +362,17 @@ const ProjectsForm = ({ projectsData, setProjectsData }) => {
                     </div>
                     
                     <div className="flex space-x-4 text-sm">
-                      <a
-                        href={project.githubLink}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-blue-400 hover:text-blue-300 transition-colors duration-300"
-                      >
-                        <i className="fab fa-github mr-1"></i>
-                        Code
+                      <a href={project.githubLink} target="_blank" rel="noopener noreferrer"
+                        className="text-blue-400 hover:text-blue-300 transition-colors duration-300">
+                        <i className="fab fa-github mr-1"></i>Code
                       </a>
-                      <a
-                        href={project.liveDemo}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-blue-400 hover:text-blue-300 transition-colors duration-300"
-                      >
-                        <i className="fas fa-external-link-alt mr-1"></i>
-                        Demo
+                      <a href={project.liveDemo} target="_blank" rel="noopener noreferrer"
+                        className="text-blue-400 hover:text-blue-300 transition-colors duration-300">
+                        <i className="fas fa-external-link-alt mr-1"></i>Demo
+                      </a>
+                      <a href={`/projects/${project._id}`} target="_blank" rel="noopener noreferrer"
+                        className="text-purple-400 hover:text-purple-300 transition-colors duration-300">
+                        <i className="fas fa-book-open mr-1"></i>Case Study
                       </a>
                     </div>
                   </div>

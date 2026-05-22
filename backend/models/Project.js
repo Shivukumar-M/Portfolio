@@ -29,6 +29,10 @@ const ProjectSchema = new mongoose.Schema({
   technologies: [{
     type: String,
   }],
+  content: {
+    type: String,
+    default: '',
+  },
   createdAt: {
     type: Date,
     default: Date.now,

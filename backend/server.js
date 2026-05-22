@@ -1,5 +1,3 @@
-// import aboutRoutes from './routes/about.js';
-
 const express = require('express');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
@@ -29,7 +27,40 @@ const connectDB = async () => {
     process.exit(1);
   }
 };
-connectDB();
+
+// Auto-create or promote the admin user from ADMIN_EMAIL / ADMIN_PASSWORD in .env
+const ensureAdmin = async () => {
+  const adminEmail = process.env.ADMIN_EMAIL;
+  const adminPassword = process.env.ADMIN_PASSWORD;
+  if (!adminEmail || !adminPassword) return;
+
+  try {
+    const User = require('./models/User');
+    let admin = await User.findOne({ email: adminEmail });
+
+    if (!admin) {
+      admin = await User.create({
+        email: adminEmail,
+        password: adminPassword,
+        username: 'superadmin',
+        isAdmin: true,
+        isSuperAdmin: true,
+        profile: { name: 'Super Admin' },
+      });
+      console.log(`✅ Super Admin account created: ${adminEmail}`);
+    } else {
+      let changed = false;
+      if (!admin.isAdmin)      { admin.isAdmin = true;      changed = true; }
+      if (!admin.isSuperAdmin) { admin.isSuperAdmin = true; changed = true; }
+      if (changed) { await admin.save(); console.log(`✅ Super Admin flags set for: ${adminEmail}`); }
+      else         { console.log(`✅ Super Admin account ready: ${adminEmail}`); }
+    }
+  } catch (err) {
+    console.error('⚠️  ensureAdmin error:', err.message);
+  }
+};
+
+connectDB().then(ensureAdmin);
 
 // Import routes
 const authRoutes = require('./routes/auth');
@@ -39,7 +70,18 @@ const projectsRoutes = require('./routes/projects');
 const contactRoutes = require('./routes/contact');
 const messagesRoutes = require('./routes/messages');
 const aboutRoutes = require('./routes/about');
-
+const publicPortfolioRoutes = require('./routes/publicPortfolio');
+const experienceRoutes = require('./routes/experience');
+const certificationsRoutes = require('./routes/certifications');
+const testimonialsRoutes = require('./routes/testimonials');
+const blogRoutes = require('./routes/blog');
+const analyticsRoutes = require('./routes/analytics');
+const aiRoutes = require('./routes/ai');
+const adminRoutes = require('./routes/admin');
+const downloadRoutes   = require('./routes/download');
+const lighthouseRoutes = require('./routes/lighthouse');
+const leadsRoutes      = require('./routes/leads');
+const templateRoutes   = require('./routes/templates');
 
 // Use routes
 app.use('/api/auth', authRoutes);
@@ -49,6 +91,21 @@ app.use('/api/projects', projectsRoutes);
 app.use('/api/contact', contactRoutes);
 app.use('/api/messages', messagesRoutes);
 app.use('/api/about', aboutRoutes);
+app.use('/api/u', publicPortfolioRoutes);
+app.use('/api/experience', experienceRoutes);
+app.use('/api/certifications', certificationsRoutes);
+app.use('/api/testimonials', testimonialsRoutes);
+app.use('/api/blog', blogRoutes);
+app.use('/api/analytics', analyticsRoutes);
+app.use('/api/ai', aiRoutes);
+app.use('/api/admin', adminRoutes);
+app.use('/api/portfolio/download', downloadRoutes);
+app.use('/api/lighthouse',         lighthouseRoutes);
+app.use('/api/leads',              leadsRoutes);
+app.use('/api/templates',          templateRoutes);
+
+// Serve uploaded template zips (admin-only via routes, this just enables static fallback)
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 
 // ==========================
@@ -126,6 +183,7 @@ app.get('/api/contact/public', (req, res) => {
     },
   });
 });
+
 
 // Default route
 app.get('/', (req, res) => {

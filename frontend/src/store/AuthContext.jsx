@@ -15,15 +15,26 @@ const AuthContext = createContext(initialState);
 // Reducer
 const authReducer = (state, action) => {
   switch (action.type) {
-    case 'LOGIN_SUCCESS':
+    case 'LOGIN_SUCCESS': {
       localStorage.setItem('token', action.payload.token);
+      // loadUser sends { user: {...}, token }
+      // login API sends { _id, email, isAdmin, token } directly
+      const userData = action.payload.user != null
+        ? action.payload.user
+        : {
+            _id: action.payload._id,
+            email: action.payload.email,
+            isAdmin: action.payload.isAdmin || false,
+            isSuperAdmin: action.payload.isSuperAdmin || false,
+          };
       return {
         ...state,
         isAuthenticated: true,
-        user: action.payload.user,
+        user: userData,
         token: action.payload.token,
         loading: false,
       };
+    }
     case 'LOGOUT':
       localStorage.removeItem('token');
       return {
@@ -68,36 +79,19 @@ export const AuthProvider = ({ children }) => {
 
   // Load user
  const loadUser = async () => {
-  if (localStorage.token) {
-    setAuthToken(localStorage.token);
+  if (!localStorage.token) {
+    dispatch({ type: 'SET_LOADING', payload: false });
+    return;
   }
-
+  setAuthToken(localStorage.token);
   try {
-    // Try to load private profile first
     const res = await axios.get('/api/profile');
     dispatch({
       type: 'LOGIN_SUCCESS',
-      payload: {
-        user: res.data,
-        token: localStorage.token,
-      },
+      payload: { user: res.data, token: localStorage.token },
     });
-  } catch (error) {
-    console.warn('Falling back to public profile...');
-    try {
-      // If private fails, use public profile
-      const res = await axios.get('http://localhost:5000/api/profile/public');
-      dispatch({
-        type: 'LOGIN_SUCCESS',
-        payload: {
-          user: res.data.profile,
-          token: null, // public mode has no token
-        },
-      });
-    } catch (publicErr) {
-      console.error('Public profile fetch error:', publicErr);
-      dispatch({ type: 'AUTH_ERROR', payload: 'Unable to load profile' });
-    }
+  } catch {
+    dispatch({ type: 'AUTH_ERROR', payload: 'Session expired' });
   }
 };
 
@@ -127,7 +121,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   // Register
-  const register = async (email, password) => {
+  const register = async (email, password, username) => {
     const config = {
       headers: {
         'Content-Type': 'application/json',
@@ -135,7 +129,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     try {
-      const res = await axios.post('/api/auth/register', { email, password }, config);
+      const res = await axios.post('/api/auth/register', { email, password, username }, config);
       dispatch({
         type: 'LOGIN_SUCCESS',
         payload: res.data,

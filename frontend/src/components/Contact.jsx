@@ -24,9 +24,12 @@ const Contact = () => {
           const res = await axios.get('/api/contact', { headers });
           setContactData(res.data);
         } else {
-          // Fetch default/public contact info
-          const res = await axios.get('http://localhost:5000/api/contact/public');
-          setContactData(res.data);
+          // Not authenticated — use hardcoded defaults
+          setContactData({
+            email: 'shivukumar@example.com',
+            phone: '+91 98765 43210',
+            location: 'Bengaluru, Karnataka, India',
+          });
         }
       } catch (error) {
         console.error('Error fetching contact:', error);

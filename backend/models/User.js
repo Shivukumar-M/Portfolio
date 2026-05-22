@@ -11,6 +11,44 @@ const UserSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  username: {
+    type: String,
+    unique: true,
+    sparse: true,
+    lowercase: true,
+    trim: true,
+  },
+  animationTheme: {
+    type: String,
+    enum: ['cosmic', 'neon', 'ocean', 'matrix', 'minimal'],
+    default: 'cosmic',
+  },
+  seoConfig: {
+    title:       { type: String, default: '' },
+    description: { type: String, default: '' },
+  },
+  sectionOrder: {
+    type: [String],
+    default: ['about', 'skills', 'projects', 'experience', 'certifications', 'testimonials', 'blog', 'contact'],
+  },
+  templateConfig: {
+    templateId:     { type: String, enum: ['cosmic','terminal','glass','magazine','retro'], default: 'cosmic' },
+    colors: {
+      primary:      { type: String, default: '' },
+      accent:       { type: String, default: '' },
+      bg:           { type: String, default: '' },
+    },
+    font:           { type: String, default: 'Inter' },
+    animationSpeed: { type: String, enum: ['none','slow','normal','fast'], default: 'normal' },
+    customCSS:      { type: String, default: '' },
+    customJS:       { type: String, default: '' },
+    sections: {
+      about:        { type: Boolean, default: true },
+      skills:       { type: Boolean, default: true },
+      projects:     { type: Boolean, default: true },
+      contact:      { type: Boolean, default: true },
+    },
+  },
   profile: {
     name: {
       type: String,
@@ -41,6 +79,10 @@ const UserSchema = new mongoose.Schema({
         type: String,
         default: '#',
       },
+      leetcode: {
+        type: String,
+        default: '',
+      },
     },
   },
   contact: {
@@ -56,6 +98,21 @@ const UserSchema = new mongoose.Schema({
       type: String,
       default: 'Your City, Country',
     },
+  },
+  isAdmin: {
+    type: Boolean,
+    default: false,
+  },
+  isSuperAdmin: {
+    type: Boolean,
+    default: false,
+  },
+  loginCount: {
+    type: Number,
+    default: 0,
+  },
+  lastLogin: {
+    type: Date,
   },
   createdAt: {
     type: Date,

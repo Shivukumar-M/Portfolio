@@ -72,11 +72,24 @@ router.get('/public', async (req, res) => {
 });
 
 /* ========================================================
+   ✅ GET single project by ID (public — for case study page)
+======================================================== */
+router.get('/:id', async (req, res) => {
+  try {
+    const project = await Project.findById(req.params.id);
+    if (!project) return res.status(404).json({ message: 'Project not found' });
+    res.json(project);
+  } catch (error) {
+    res.status(500).json({ message: 'Server Error', error: error.message });
+  }
+});
+
+/* ========================================================
    ✅ ADD a new project
 ======================================================== */
 router.post('/', auth, async (req, res) => {
   try {
-    const { title, description, image, githubLink, liveDemo, technologies } = req.body;
+    const { title, description, image, githubLink, liveDemo, technologies, content } = req.body;
 
     const newProject = new Project({
       userId: req.user.id,
@@ -86,6 +99,7 @@ router.post('/', auth, async (req, res) => {
       githubLink,
       liveDemo,
       technologies,
+      content: content || '',
     });
 
     const savedProject = await newProject.save();
@@ -101,11 +115,11 @@ router.post('/', auth, async (req, res) => {
 ======================================================== */
 router.put('/:id', auth, async (req, res) => {
   try {
-    const { title, description, image, githubLink, liveDemo, technologies } = req.body;
+    const { title, description, image, githubLink, liveDemo, technologies, content } = req.body;
 
     const project = await Project.findOneAndUpdate(
       { _id: req.params.id, userId: req.user.id },
-      { title, description, image, githubLink, liveDemo, technologies },
+      { title, description, image, githubLink, liveDemo, technologies, content: content || '' },
       { new: true }
     );
 

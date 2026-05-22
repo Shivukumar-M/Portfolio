@@ -14,7 +14,7 @@ const generateToken = (id) => {
 // Register user
 router.post('/register', async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, password, username } = req.body;
 
     // Check if user exists
     const userExists = await User.findOne({ email });
@@ -22,15 +22,28 @@ router.post('/register', async (req, res) => {
       return res.status(400).json({ message: 'User already exists' });
     }
 
+    // Generate username from email if not provided, ensure uniqueness
+    let finalUsername = username
+      ? username.toLowerCase().replace(/[^a-z0-9_]/g, '')
+      : email.split('@')[0].toLowerCase().replace(/[^a-z0-9_]/g, '');
+
+    // If username taken, append random 4 digits
+    const usernameTaken = await User.findOne({ username: finalUsername });
+    if (usernameTaken) {
+      finalUsername = `${finalUsername}${Math.floor(1000 + Math.random() * 9000)}`;
+    }
+
     // Create user
     const user = await User.create({
       email,
       password,
+      username: finalUsername,
     });
 
     res.status(201).json({
       _id: user._id,
       email: user.email,
+      username: user.username,
       token: generateToken(user._id),
     });
   } catch (error) {
@@ -56,9 +69,16 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
 
+    // Track login stats
+    user.loginCount = (user.loginCount || 0) + 1;
+    user.lastLogin = new Date();
+    await user.save();
+
     res.json({
       _id: user._id,
       email: user.email,
+      isAdmin: user.isAdmin,
+      isSuperAdmin: user.isSuperAdmin,
       token: generateToken(user._id),
     });
   } catch (error) {

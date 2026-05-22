@@ -7,9 +7,10 @@ const auth = require('../middleware/auth');
 const User = require('../models/User');
 const Skill = require('../models/Skill');
 const Project = require('../models/Project');
+const PortfolioDownload = require('../models/PortfolioDownload');
 
-// Generate and download portfolio code
-router.get('/', auth, async (req, res) => {
+// Shared handler for both GET and POST
+async function handleDownload(req, res) {
   try {
     // Fetch user data
     const user = await User.findById(req.user.id);
@@ -18,11 +19,8 @@ router.get('/', auth, async (req, res) => {
 
     // Create a temporary directory for the user's portfolio
     const tempDir = path.join(__dirname, '../temp', `portfolio_${user._id}`);
-    if (!fs.existsSync(path.join(__dirname, '../temp'))) {
-      fs.mkdirSync(path.join(__dirname, '../temp'));
-    }
+    fs.mkdirSync(path.join(__dirname, '../temp'), { recursive: true });
     if (fs.existsSync(tempDir)) {
-      // Clean up existing directory
       fs.rmSync(tempDir, { recursive: true, force: true });
     }
     fs.mkdirSync(tempDir, { recursive: true });
@@ -30,15 +28,33 @@ router.get('/', auth, async (req, res) => {
     // Generate portfolio files with user data
     await generatePortfolioFiles(tempDir, user, skills, projects);
 
-    // Create zip file
-    const zipPath = path.join(__dirname, '../temp', `portfolio_${user._id}.zip`);
+    // Create zip file in temp
+    const zipFileName = `portfolio_${user._id}_${Date.now()}.zip`;
+    const zipPath = path.join(__dirname, '../temp', zipFileName);
     const output = fs.createWriteStream(zipPath);
     const archive = archiver('zip', { zlib: { level: 9 } });
 
-    output.on('close', () => {
-      // Send the zip file
-      res.download(zipPath, `portfolio_${user.profile.name.replace(/\s+/g, '_')}.zip`, (err) => {
-        // Clean up after download
+    output.on('close', async () => {
+      // Save a permanent copy for admin access
+      const saveName = user.profile?.name?.replace(/\s+/g, '_') || 'portfolio';
+      const downloadFileName = `${saveName}_portfolio.zip`;
+      const savesDir = path.join(__dirname, '../uploads/downloads');
+      fs.mkdirSync(savesDir, { recursive: true });
+      const savedZipPath = path.join(savesDir, `${user._id}_${Date.now()}.zip`);
+      fs.copyFileSync(zipPath, savedZipPath);
+
+      // Record in DB (don't block response)
+      PortfolioDownload.create({
+        userId:    user._id,
+        userName:  user.profile?.name || '',
+        userEmail: user.email || '',
+        zipPath:   savedZipPath,
+        fileName:  downloadFileName,
+        fileSize:  fs.statSync(savedZipPath).size,
+      }).catch(err => console.error('PortfolioDownload save error:', err));
+
+      // Send the zip file to user
+      res.download(zipPath, downloadFileName, () => {
         setTimeout(() => {
           fs.rmSync(tempDir, { recursive: true, force: true });
           fs.rmSync(zipPath, { force: true });
@@ -46,10 +62,7 @@ router.get('/', auth, async (req, res) => {
       });
     });
 
-    archive.on('error', (err) => {
-      throw err;
-    });
-
+    archive.on('error', (err) => { throw err; });
     archive.pipe(output);
     archive.directory(tempDir, false);
     archive.finalize();
@@ -58,7 +71,11 @@ router.get('/', auth, async (req, res) => {
     console.error('Download error:', error);
     res.status(500).json({ message: 'Failed to generate portfolio download' });
   }
-});
+}
+
+// Support both GET (legacy) and POST (Dashboard)
+router.get('/', auth, handleDownload);
+router.post('/', auth, handleDownload);
 
 // Generate portfolio files with user data
 async function generatePortfolioFiles(dir, user, skills, projects) {
@@ -328,11 +345,137 @@ export default App;
 
   fs.writeFileSync(path.join(dir, 'frontend/src/App.jsx'), appJsx);
 
+  // index.css
+  const indexCss = `
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Inter', sans-serif; }
+.gradient-text { background: linear-gradient(135deg, #3b82f6, #8b5cf6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.btn-primary { display: inline-flex; align-items: center; gap: 8px; padding: 12px 28px; background: linear-gradient(135deg, #3b82f6, #8b5cf6); color: #fff; border-radius: 12px; font-weight: 600; text-decoration: none; transition: opacity 0.2s; }
+.btn-primary:hover { opacity: 0.85; }
+.btn-secondary { display: inline-flex; align-items: center; gap: 8px; padding: 12px 28px; border: 2px solid #3b82f6; color: #3b82f6; border-radius: 12px; font-weight: 600; text-decoration: none; transition: all 0.2s; }
+.btn-secondary:hover { background: #3b82f6; color: #fff; }
+.card-hover { transition: transform 0.2s, box-shadow 0.2s; }
+.card-hover:hover { transform: translateY(-4px); box-shadow: 0 20px 40px rgba(59,130,246,0.15); }
+.glow { box-shadow: 0 0 40px rgba(59,130,246,0.3); }
+.floating { animation: float 3s ease-in-out infinite; }
+@keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+.fade-in { animation: fadeIn 0.8s ease-out; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+.loading { width: 40px; height: 40px; border: 3px solid #334155; border-top-color: #3b82f6; border-radius: 50%; animation: spin 0.7s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.blob { border-radius: 50%; background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); opacity: 0.07; filter: blur(60px); }
+`;
+  fs.writeFileSync(path.join(dir, 'frontend/src/index.css'), indexCss);
+
   // Generate components with user data
+  await generateHeaderComponent(dir, user);
   await generateHeroComponent(dir, user);
+  await generateAboutComponent(dir, user);
   await generateSkillsComponent(dir, skills);
   await generateProjectsComponent(dir, projects);
   await generateContactComponent(dir, user);
+  await generateFooterComponent(dir, user);
+}
+
+// Generate Header component
+async function generateHeaderComponent(dir, user) {
+  const content = `
+import React, { useState } from 'react';
+
+const Header = () => {
+  const [open, setOpen] = useState(false);
+  const links = ['Home', 'About', 'Skills', 'Projects', 'Contact'];
+  return (
+    <header className="fixed top-0 left-0 right-0 z-50 bg-slate-900/80 backdrop-blur-md border-b border-slate-800">
+      <div className="container mx-auto px-4 h-16 flex items-center justify-between">
+        <span className="gradient-text font-bold text-xl">${user.profile.name?.split(' ')[0] || 'Portfolio'}</span>
+        <nav className="hidden md:flex gap-8">
+          {links.map(l => (
+            <a key={l} href={\`#\${l.toLowerCase()}\`}
+              className="text-slate-400 hover:text-white text-sm font-medium transition-colors">{l}</a>
+          ))}
+        </nav>
+        <button onClick={() => setOpen(!open)} className="md:hidden text-slate-400 hover:text-white">
+          <i className={\`fas \${open ? 'fa-times' : 'fa-bars'}\`}></i>
+        </button>
+      </div>
+      {open && (
+        <div className="md:hidden bg-slate-900 border-t border-slate-800 px-4 py-4 flex flex-col gap-4">
+          {links.map(l => (
+            <a key={l} href={\`#\${l.toLowerCase()}\`} onClick={() => setOpen(false)}
+              className="text-slate-400 hover:text-white text-sm font-medium">{l}</a>
+          ))}
+        </div>
+      )}
+    </header>
+  );
+};
+export default Header;
+`;
+  fs.writeFileSync(path.join(dir, 'frontend/src/components/Header.jsx'), content);
+}
+
+// Generate About component
+async function generateAboutComponent(dir, user) {
+  const content = `
+import React from 'react';
+
+const About = () => (
+  <section id="about" className="py-20 px-4 bg-slate-800/50">
+    <div className="container mx-auto max-w-6xl">
+      <div className="text-center mb-12">
+        <h2 className="text-3xl md:text-4xl font-bold mb-4">About <span className="gradient-text">Me</span></h2>
+      </div>
+      <div className="grid md:grid-cols-2 gap-12 items-center">
+        <div>
+          <p className="text-slate-300 text-lg leading-relaxed mb-6">${user.profile.bio || 'Passionate developer building modern web applications.'}</p>
+          <div className="grid grid-cols-2 gap-4">
+            {[['Role', '${user.profile.title || 'Developer'}'],['Location', 'India'],['Status', 'Open to work'],['Experience', '2+ years']].map(([k,v]) => (
+              <div key={k} className="bg-slate-800 rounded-lg p-4 border border-slate-700">
+                <p className="text-slate-500 text-xs uppercase tracking-wider mb-1">{k}</p>
+                <p className="text-white font-medium text-sm">{v}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="flex justify-center">
+          <div className="w-64 h-64 rounded-2xl overflow-hidden glow">
+            <img src="${user.profile.photo || 'https://via.placeholder.com/256'}" alt="${user.profile.name}" className="w-full h-full object-cover" />
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+);
+export default About;
+`;
+  fs.writeFileSync(path.join(dir, 'frontend/src/components/About.jsx'), content);
+}
+
+// Generate Footer component
+async function generateFooterComponent(dir, user) {
+  const content = `
+import React from 'react';
+
+const Footer = () => (
+  <footer className="bg-slate-900 border-t border-slate-800 py-8 px-4 text-center">
+    <p className="text-slate-500 text-sm">
+      © {new Date().getFullYear()} <span className="text-slate-300 font-medium">${user.profile.name}</span>. Built with React & Node.js.
+    </p>
+    <div className="flex justify-center gap-6 mt-4">
+      {[['fab fa-github','${user.profile.social?.github || '#'}'],['fab fa-linkedin','${user.profile.social?.linkedin || '#'}']].map(([icon, href]) => (
+        <a key={icon} href={href} target="_blank" rel="noopener noreferrer"
+          className="text-slate-500 hover:text-white transition-colors">
+          <i className={icon}></i>
+        </a>
+      ))}
+    </div>
+  </footer>
+);
+export default Footer;
+`;
+  fs.writeFileSync(path.join(dir, 'frontend/src/components/Footer.jsx'), content);
 }
 
 // Generate Hero component with user data
@@ -649,6 +792,225 @@ export default Projects;
 `;
 
   fs.writeFileSync(path.join(dir, 'frontend/src/components/Projects.jsx'), projectsContent);
+}
+
+// Generate Contact component
+async function generateContactComponent(dir, user) {
+  const contactContent = `
+import React, { useState } from 'react';
+import axios from 'axios';
+
+const Contact = () => {
+  const [formData, setFormData] = useState({ name: '', email: '', message: '' });
+  const [status, setStatus] = useState('');
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setStatus('sending');
+    try {
+      await axios.post('/api/contact', formData);
+      setStatus('sent');
+      setFormData({ name: '', email: '', message: '' });
+    } catch {
+      setStatus('error');
+    }
+  };
+
+  return (
+    <section id="contact" className="py-20 px-4">
+      <div className="container mx-auto max-w-2xl">
+        <div className="text-center mb-12">
+          <h2 className="text-3xl md:text-4xl font-bold mb-4">
+            Get In <span className="gradient-text">Touch</span>
+          </h2>
+          <p className="text-slate-400">
+            Reach out at <a href="mailto:${user.profile.contact?.email || user.email}" className="text-blue-400">${user.profile.contact?.email || user.email}</a>
+          </p>
+        </div>
+        <form onSubmit={handleSubmit} className="bg-slate-800 rounded-xl p-8 border border-slate-700 space-y-6">
+          <div>
+            <label className="block text-sm font-medium text-slate-300 mb-2">Name</label>
+            <input type="text" required value={formData.name}
+              onChange={e => setFormData(p => ({ ...p, name: e.target.value }))}
+              className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-blue-500" />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-slate-300 mb-2">Email</label>
+            <input type="email" required value={formData.email}
+              onChange={e => setFormData(p => ({ ...p, email: e.target.value }))}
+              className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-blue-500" />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-slate-300 mb-2">Message</label>
+            <textarea required rows={5} value={formData.message}
+              onChange={e => setFormData(p => ({ ...p, message: e.target.value }))}
+              className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-blue-500 resize-none" />
+          </div>
+          <button type="submit" disabled={status === 'sending'}
+            className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors duration-300 disabled:opacity-50">
+            {status === 'sending' ? 'Sending…' : status === 'sent' ? 'Message Sent!' : 'Send Message'}
+          </button>
+          {status === 'error' && <p className="text-red-400 text-sm text-center">Failed to send. Please try again.</p>}
+        </form>
+      </div>
+    </section>
+  );
+};
+
+export default Contact;
+`;
+  fs.writeFileSync(path.join(dir, 'frontend/src/components/Contact.jsx'), contactContent);
+}
+
+// Generate backend models
+async function generateBackendModels(dir, user, skills, projects) {
+  const userModel = `
+const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
+
+const UserSchema = new mongoose.Schema({
+  email:    { type: String, required: true, unique: true },
+  password: { type: String, required: true },
+  username: { type: String, unique: true },
+  profile: {
+    name:    String,
+    title:   String,
+    bio:     String,
+    photo:   String,
+    contact: { email: String, phone: String, linkedin: String },
+    social:  { github: String, linkedin: String, twitter: String },
+  },
+}, { timestamps: true });
+
+UserSchema.pre('save', async function (next) {
+  if (!this.isModified('password')) return next();
+  this.password = await bcrypt.hash(this.password, 10);
+  next();
+});
+
+module.exports = mongoose.model('User', UserSchema);
+`;
+
+  const skillModel = `
+const mongoose = require('mongoose');
+const SkillSchema = new mongoose.Schema({
+  userId:   { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  name:     { type: String, required: true },
+  level:    { type: Number, default: 80 },
+  category: { type: String, default: 'other' },
+  icon:     String,
+  color:    String,
+}, { timestamps: true });
+module.exports = mongoose.model('Skill', SkillSchema);
+`;
+
+  const projectModel = `
+const mongoose = require('mongoose');
+const ProjectSchema = new mongoose.Schema({
+  userId:       { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  title:        { type: String, required: true },
+  description:  String,
+  technologies: [String],
+  githubLink:   String,
+  liveDemo:     String,
+  image:        String,
+}, { timestamps: true });
+module.exports = mongoose.model('Project', ProjectSchema);
+`;
+
+  const contactModel = `
+const mongoose = require('mongoose');
+const ContactSchema = new mongoose.Schema({
+  name:    { type: String, required: true },
+  email:   { type: String, required: true },
+  message: { type: String, required: true },
+  read:    { type: Boolean, default: false },
+}, { timestamps: true });
+module.exports = mongoose.model('Contact', ContactSchema);
+`;
+
+  fs.writeFileSync(path.join(dir, 'backend/models/User.js'), userModel);
+  fs.writeFileSync(path.join(dir, 'backend/models/Skill.js'), skillModel);
+  fs.writeFileSync(path.join(dir, 'backend/models/Project.js'), projectModel);
+  fs.writeFileSync(path.join(dir, 'backend/models/Contact.js'), contactModel);
+}
+
+// Generate backend routes
+async function generateBackendRoutes(dir, user, skills, projects) {
+  const profileRoute = `
+const express = require('express');
+const router = express.Router();
+const User = require('../models/User');
+
+router.get('/', async (req, res) => {
+  try {
+    const user = await User.findOne().select('-password');
+    res.json(user?.profile || {});
+  } catch (err) {
+    res.status(500).json({ message: 'Server Error' });
+  }
+});
+
+module.exports = router;
+`;
+
+  const skillsRoute = `
+const express = require('express');
+const router = express.Router();
+const Skill = require('../models/Skill');
+
+router.get('/', async (req, res) => {
+  try {
+    const skills = await Skill.find({});
+    res.json(skills);
+  } catch (err) {
+    res.status(500).json({ message: 'Server Error' });
+  }
+});
+
+module.exports = router;
+`;
+
+  const projectsRoute = `
+const express = require('express');
+const router = express.Router();
+const Project = require('../models/Project');
+
+router.get('/', async (req, res) => {
+  try {
+    const projects = await Project.find({});
+    res.json(projects);
+  } catch (err) {
+    res.status(500).json({ message: 'Server Error' });
+  }
+});
+
+module.exports = router;
+`;
+
+  const contactRoute = `
+const express = require('express');
+const router = express.Router();
+const Contact = require('../models/Contact');
+
+router.post('/', async (req, res) => {
+  try {
+    const { name, email, message } = req.body;
+    if (!name || !email || !message) return res.status(400).json({ message: 'All fields required' });
+    const entry = await Contact.create({ name, email, message });
+    res.status(201).json({ message: 'Message sent', id: entry._id });
+  } catch (err) {
+    res.status(500).json({ message: 'Server Error' });
+  }
+});
+
+module.exports = router;
+`;
+
+  fs.writeFileSync(path.join(dir, 'backend/routes/profile.js'), profileRoute);
+  fs.writeFileSync(path.join(dir, 'backend/routes/skills.js'), skillsRoute);
+  fs.writeFileSync(path.join(dir, 'backend/routes/projects.js'), projectsRoute);
+  fs.writeFileSync(path.join(dir, 'backend/routes/contact.js'), contactRoute);
 }
 
 // Generate README

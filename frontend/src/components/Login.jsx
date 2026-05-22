@@ -6,6 +6,7 @@ const Login = () => {
   const [formData, setFormData] = useState({
     email: '',
     password: '',
+    username: '',
   });
   const [isRegistering, setIsRegistering] = useState(false);
   const [error, setError] = useState('');
@@ -28,12 +29,13 @@ const Login = () => {
     setLoading(true);
 
     try {
+      let result;
       if (isRegistering) {
-        await register(formData.email, formData.password);
+        result = await register(formData.email, formData.password, formData.username);
       } else {
-        await login(formData.email, formData.password);
+        result = await login(formData.email, formData.password);
       }
-      navigate('/dashboard');
+      navigate(result?.isAdmin ? '/admin' : '/dashboard');
     } catch (err) {
       setError(err.message || 'An error occurred');
     } finally {
@@ -66,6 +68,26 @@ const Login = () => {
           )}
 
           <form onSubmit={handleSubmit} className="space-y-6">
+            {isRegistering && (
+              <div>
+                <label htmlFor="username" className="block text-sm font-medium text-slate-300 mb-2">
+                  Username <span className="text-slate-500 text-xs">(your public URL: /u/username)</span>
+                </label>
+                <div className="relative">
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm">@</span>
+                  <input
+                    type="text"
+                    id="username"
+                    name="username"
+                    value={formData.username}
+                    onChange={e => setFormData(prev => ({ ...prev, username: e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, '') }))}
+                    className="w-full pl-8 pr-4 py-3 bg-slate-700 border border-slate-600 rounded-lg focus:outline-none focus:border-blue-500 text-white font-mono transition-colors duration-300"
+                    placeholder="johndoe"
+                  />
+                </div>
+                <p className="text-slate-500 text-xs mt-1">Letters, numbers and underscore only. Auto-generated if left blank.</p>
+              </div>
+            )}
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-slate-300 mb-2">
                 Email

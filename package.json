@@ -1,0 +1,25 @@
+{
+  "name": "portfolio",
+  "version": "1.0.0",
+  "description": "A full-stack dynamic portfolio website built with the **MERN** stack. Users can register, log in, manage their profile and projects through a dashboard, and share a unique public portfolio URL. Visitors without an account see a default public portfolio.",
+  "main": "index.js",
+  "scripts": {
+    "dev": "concurrently --names \"backend,frontend\" --prefix-colors \"cyan,magenta\" \"npm run dev --prefix backend\" \"npm run dev --prefix frontend\"",
+    "start": "concurrently --names \"backend,frontend\" --prefix-colors \"cyan,magenta\" \"npm start --prefix backend\" \"npm run dev --prefix frontend\"",
+    "install:all": "npm install && npm install --prefix backend && npm install --prefix frontend"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Shivukumar-M/Portfolio.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Shivukumar-M/Portfolio/issues"
+  },
+  "homepage": "https://github.com/Shivukumar-M/Portfolio#readme",
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}

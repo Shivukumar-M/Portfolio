@@ -1,100 +1,192 @@
-# 🚀 AI-Powered MERN Portfolio Builder
+# MERN Portfolio Builder
 
-A full-stack dynamic portfolio website built using the **MERN** stack with **user authentication**, **profile editor**, **project manager**, and **public portfolio mode**.  
-Users can create an account, upload skills/projects, and generate a professional portfolio using AI suggestions.
-
----
-
-## ✅ **Key Features**
-
-### 🔐 **User Authentication**
-- JWT-based login/signup
-- Secure password hashing with bcrypt
-- Profile dashboard for logged-in users
-
-### 👤 **Dynamic Profile & Skills**
-- Upload profile image, bio, and social links
-- Add skills with icons, levels, and categories
-- Public visitor mode shows default profile & skills
-
-### 🧩 **Projects Showcase**
-- Add, edit, and delete projects from dashboard
-- GitHub link + Live demo button for each project
-- Public visitors see default projects if no account exists
-
-
-### 📎 **File Uploads**
-- Upload profile images & project thumbnails
-- Static image hosting via Express `/images`
-
-### 🌍 **Public Portfolio Mode**
-- Anyone visiting without login sees:
-  ✅ Default profile  
-  ✅ Default skills  
-  ✅ Default projects  
-- Prevents “empty site” issues
-
-### 💾 **Download Portfolio Code**
-- Users can generate & download portfolio as ZIP
-- Ready-to-deploy React build
-
-### 🧩 **Contact Form**
-- Stores user messages into MongoDB
-- Works even when user is logged out
+A full-stack dynamic portfolio website built with the **MERN** stack. Users can register, log in, manage their profile and projects through a dashboard, and share a unique public portfolio URL. Visitors without an account see a default public portfolio.
 
 ---
 
-## 🛠 Tech Stack
+## Features
+
+### Authentication
+- JWT-based register / login / logout
+- Passwords hashed with bcryptjs
+- Protected routes on both frontend and backend
+
+### Dashboard
+- Edit profile: name, title, bio, photo, social links
+- Manage skills, projects, and about section via dedicated forms
+- View and delete incoming contact messages (inbox)
+- Download portfolio as a ZIP file (ready-to-deploy)
+
+### Public Portfolio
+- Every user gets a shareable URL: `/u/:username`
+- Visitors who are not logged in see the owner's live data
+- Unauthenticated access to the root `/` shows a default public portfolio
+
+### Template Customizer
+- Switch between five visual themes: **Cosmic**, **Glass**, **Magazine**, **Retro**, **Terminal**
+- Preview and apply themes directly from the dashboard
+
+### Contact Form
+- Any visitor can submit a message without logging in
+- Messages are stored in MongoDB and viewable by the portfolio owner
+
+### File Uploads
+- Upload profile photo and project thumbnail images
+- Served as static assets via Express
+
+---
+
+## Tech Stack
 
 | Layer | Technology |
 |-------|------------|
-| Frontend | React, Vite, TailwindCSS, Axios |
-| Backend | Node.js, Express.js |
-| Database | MongoDB Atlas (Mongoose) |
-| Auth | JWT, bcrypt |
-| AI | OpenAI / Gemini API |
-| Deployment | Vercel / Render |
+| Frontend | React 19, Vite (rolldown), React Router 7, Axios |
+| Styling | TailwindCSS |
+| Backend | Node.js, Express 5 |
+| Database | MongoDB (Mongoose 8) |
+| Auth | JWT, bcryptjs |
+| Extras | archiver (ZIP download), dotenv, cors |
 
 ---
 
-## 📌 API Routes (Quick Overview)
+## Project Structure
 
-| Route | Purpose |
-|-------|---------|
-| `/api/auth/login` | Login user |
-| `/api/auth/register` | Register new user |
-| `/api/profile` | CRUD on profile |
-| `/api/skills` | Skill management |
-| `/api/projects` | Project management |
-| `/api/messages` | Save contact form messages |
-| `/api/*/public` | Public fallback data without login |
+```
+Portfolio/
+├── backend/
+│   ├── config/         # MongoDB connection
+│   ├── controllers/    # Business logic (messages, projects)
+│   ├── middleware/     # JWT auth middleware
+│   ├── models/         # Mongoose schemas (User, Project, Skill, About, Message)
+│   ├── routes/         # Express route handlers
+│   │   ├── auth.js
+│   │   ├── profile.js
+│   │   ├── skills.js
+│   │   ├── projects.js
+│   │   ├── about.js
+│   │   ├── contact.js
+│   │   ├── messages.js
+│   │   ├── publicPortfolio.js
+│   │   └── download.js
+│   └── server.js
+├── frontend/
+│   └── src/
+│       ├── components/
+│       │   ├── templates/   # Cosmic, Glass, Magazine, Retro, Terminal
+│       │   ├── forms/       # Profile, Skills, Projects, About, Contact forms
+│       │   ├── Dashboard.jsx
+│       │   ├── PublicPortfolio.jsx
+│       │   ├── TemplateCustomizer.jsx
+│       │   ├── MessagesInbox.jsx
+│       │   └── ParticleCanvas.jsx
+│       ├── store/
+│       │   └── AuthContext.jsx
+│       └── App.jsx
+├── images/              # Screenshot assets for README
+└── template/            # Standalone HTML template files
+```
 
 ---
 
-## 📸 Screenshots
+## API Routes
 
-#### ✅ Home Page
-![Home Page](./images/home.png)
-
-#### ✅ Skills
-![Skills](./images/profile.png)
-
----
-
-## ✅ How It Works
-
-| Action | Logged-in User | Visitor (No Login) |
-|--------|----------------|--------------------|
-| View Profile | Shows user’s saved profile | Shows default profile |
-| Skills | Shows saved skills | Shows default skills |
-| Projects | Shows saved projects | Shows default projects |
-| Contact Form | Saves messages | Saves messages |
-| AI Suggestions | ✅ Yes | ✅ Limited public mode |
+| Method | Route | Auth | Description |
+|--------|-------|------|-------------|
+| POST | `/api/auth/register` | No | Register a new user |
+| POST | `/api/auth/login` | No | Login and get JWT |
+| GET/PUT | `/api/profile` | Yes | Get or update profile |
+| GET/POST/PUT/DELETE | `/api/skills` | Yes | Manage skills |
+| GET/POST/PUT/DELETE | `/api/projects` | Yes | Manage projects |
+| GET/PUT | `/api/about` | Yes | Manage about section |
+| POST | `/api/contact` | No | Submit contact form message |
+| GET/DELETE | `/api/messages` | Yes | Read or delete inbox messages |
+| GET | `/api/u/:username` | No | Public portfolio by username |
+| GET | `/api/profile/public` | No | Default public profile fallback |
+| GET | `/api/skills/public` | No | Default public skills fallback |
+| GET | `/api/projects/public` | No | Default public projects fallback |
+| GET | `/api/download` | Yes | Download portfolio as ZIP |
 
 ---
 
-## 📦 Installation
+## Getting Started
+
+### Prerequisites
+- Node.js v18+
+- MongoDB Atlas account (or local MongoDB)
+
+### 1. Clone the repository
 
 ```bash
-git clone https://github.com/YOUR_REPO/mern-portfolio
+git clone https://github.com/Shivukumar-M/mern-portfolio.git
 cd mern-portfolio
+```
+
+### 2. Configure the backend
+
+```bash
+cd backend
+cp .env.example .env
+```
+
+Edit `.env`:
+
+```env
+MONGO_URI=your_mongodb_connection_string
+JWT_SECRET=your_jwt_secret
+PORT=5000
+```
+
+Install dependencies and start:
+
+```bash
+npm install
+npm run dev
+```
+
+### 3. Configure the frontend
+
+```bash
+cd ../frontend
+npm install
+npm run dev
+```
+
+The frontend dev server runs on `http://localhost:5173` and proxies API requests to `http://localhost:5000`.
+
+### 4. Build for production
+
+```bash
+cd frontend
+npm run build
+```
+
+The output is in `frontend/dist/` and can be served from any static host (Vercel, Netlify, etc.).
+
+---
+
+## Screenshots
+
+### Home Page
+![Home Page](./images/home.png)
+
+### Profile / Skills
+![Profile](./images/profile.png)
+
+---
+
+## How It Works
+
+| Feature | Logged-in User | Visitor |
+|---------|---------------|---------|
+| View portfolio | Own saved data | Default fallback data |
+| Edit profile / skills / projects | Yes | No |
+| Submit contact form | Yes | Yes |
+| View messages inbox | Yes | No |
+| Download portfolio ZIP | Yes | No |
+| Public portfolio URL `/u/:username` | Yes | Yes |
+
+---
+
+## License
+
+MIT
