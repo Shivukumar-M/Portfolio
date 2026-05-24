@@ -450,7 +450,7 @@ const TemplateCustomizer = ({ profileData }) => {
                     className="flex-1 px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white font-mono text-sm focus:outline-none focus:border-purple-500" />
                 </div>
                 <div className="flex gap-2 mt-3 flex-wrap">
-                  {['#a855f7','#06b6d4','#f97316','#00ff41','#ff007a','#0ea5e9','#ec4899','#10b981'].map(c => (
+                  {['#a855f7','#06b6d4','#f97316','#00ff41','#ff007a','#0ea5e9','#ec4899','#00ff88'].map(c => (
                     <button key={c} onClick={() => updateColor(key, c)}
                       className="w-6 h-6 rounded-full border-2 hover:scale-110 transition-all"
                       style={{ background: c, borderColor: cfg.colors[key] === c ? '#fff' : 'transparent' }} />

@@ -563,7 +563,7 @@ export default function AdminDashboard() {
             <span style={{ fontFamily: M, fontSize: 11, color: T.text3 }}>
               {new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
             </span>
-            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, background: 'rgba(16,185,129,0.12)', color: T.green, fontSize: 10, fontWeight: 700, padding: '3px 9px', borderRadius: 9999, border: `1px solid rgba(16,185,129,0.25)`, letterSpacing: '0.08em' }}>
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, background: 'rgba(0,255,136,0.12)', color: T.green, fontSize: 10, fontWeight: 700, padding: '3px 9px', borderRadius: 9999, border: `1px solid rgba(0,255,136,0.25)`, letterSpacing: '0.08em' }}>
               <span style={{ width: 5, height: 5, borderRadius: 9999, background: T.green, display: 'inline-block', animation: 'pulse 1.5s infinite' }} />
               LIVE
             </span>
@@ -824,9 +824,9 @@ export default function AdminDashboard() {
                               <button onClick={() => toggleAdmin(u._id, u.isAdmin)}
                                 style={{
                                   padding: '4px 12px', borderRadius: 20, fontFamily: R, fontSize: 11, fontWeight: 500, cursor: 'pointer',
-                                  background: u.isAdmin ? 'rgba(244,63,94,0.1)' : 'rgba(16,185,129,0.1)',
+                                  background: u.isAdmin ? 'rgba(244,63,94,0.1)' : 'rgba(0,255,136,0.1)',
                                   color: u.isAdmin ? T.red : T.green,
-                                  border: `1px solid ${u.isAdmin ? 'rgba(244,63,94,0.25)' : 'rgba(16,185,129,0.25)'}`,
+                                  border: `1px solid ${u.isAdmin ? 'rgba(244,63,94,0.25)' : 'rgba(0,255,136,0.25)'}`,
                                 }}>
                                 {u.isAdmin ? 'Revoke Admin' : 'Make Admin'}
                               </button>
@@ -933,7 +933,7 @@ export default function AdminDashboard() {
           boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
           ...(toast.type === 'err'
             ? { background: '#1A0C10', border: `1px solid rgba(244,63,94,0.3)`, color: T.red }
-            : { background: '#0C1A14', border: `1px solid rgba(16,185,129,0.3)`, color: T.green }),
+            : { background: '#0C1A14', border: `1px solid rgba(0,255,136,0.3)`, color: T.green }),
         }}>
           <i className={`fas ${toast.type === 'err' ? 'fa-exclamation-circle' : 'fa-check-circle'}`} />
           {toast.msg}

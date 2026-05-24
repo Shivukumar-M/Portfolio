@@ -3,31 +3,23 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../store/AuthContext.jsx';
 
 const Login = () => {
-  const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-    username: '',
-  });
+  const [formData, setFormData] = useState({ email: '', password: '', username: '' });
   const [isRegistering, setIsRegistering] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  
+
   const { login, register } = useAuth();
   const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value,
-    }));
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setLoading(true);
-
     try {
       let result;
       if (isRegistering) {
@@ -43,118 +35,297 @@ const Login = () => {
     }
   };
 
+  const inputStyle = {
+    width: '100%',
+    height: '2.375rem',
+    padding: '0 0.75rem',
+    background: 'transparent',
+    border: '1px solid #27272a',
+    borderRadius: 8,
+    fontFamily: 'Inter, sans-serif',
+    fontSize: '0.875rem',
+    color: '#fafafa',
+    outline: 'none',
+    boxSizing: 'border-box',
+    transition: 'border-color 0.15s ease, box-shadow 0.15s ease',
+  };
+
+  const focusInput = (e) => {
+    e.target.style.borderColor = '#00ff88';
+    e.target.style.boxShadow = '0 0 0 3px rgba(16, 185, 129, 0.15)';
+  };
+  const blurInput = (e) => {
+    e.target.style.borderColor = '#27272a';
+    e.target.style.boxShadow = 'none';
+  };
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-900 px-4">
-      <div className="w-full max-w-md">
-        <div className="bg-slate-800 rounded-lg p-8 border border-slate-700">
-          <div className="text-center mb-8">
-            <div className="w-16 h-16 bg-blue-500 rounded-lg flex items-center justify-center mx-auto mb-4">
-              <span className="text-white font-bold text-2xl">P</span>
-            </div>
-            <h1 className="text-2xl font-bold text-white mb-2">
-              {isRegistering ? 'Create Account' : 'Sign In'}
+    <div
+      style={{
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: '#09090b',
+        padding: '1.5rem',
+      }}
+    >
+      <div style={{ width: '100%', maxWidth: 400, display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+
+        {/* Brand mark */}
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.625rem' }}>
+          <div
+            style={{
+              width: 40,
+              height: 40,
+              borderRadius: 10,
+              background: '#00ff88',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <span style={{ color: '#fff', fontWeight: 700, fontSize: '1.125rem', fontFamily: 'Inter, sans-serif' }}>S</span>
+          </div>
+          <span style={{ color: '#fafafa', fontWeight: 600, fontSize: '1rem', letterSpacing: '-0.01em' }}>
+            Portfolio
+          </span>
+        </div>
+
+        {/* Card */}
+        <div
+          style={{
+            background: '#18181b',
+            border: '1px solid #27272a',
+            borderRadius: 14,
+            padding: '1.75rem',
+          }}
+        >
+          {/* Heading */}
+          <div style={{ marginBottom: '1.5rem' }}>
+            <h1
+              style={{
+                margin: '0 0 0.375rem',
+                fontSize: '1.25rem',
+                fontWeight: 600,
+                color: '#fafafa',
+                letterSpacing: '-0.02em',
+                fontFamily: 'Inter, sans-serif',
+              }}
+            >
+              {isRegistering ? 'Create an account' : 'Welcome back'}
             </h1>
-            <p className="text-slate-400">
-              {isRegistering 
-                ? 'Create an account to manage your portfolio' 
+            <p style={{ margin: 0, fontSize: '0.875rem', color: '#71717a', fontFamily: 'Inter, sans-serif' }}>
+              {isRegistering
+                ? 'Enter your details to get started'
                 : 'Sign in to manage your portfolio'}
             </p>
           </div>
 
+          {/* Error */}
           {error && (
-            <div className="bg-red-900/20 border border-red-500/30 text-red-400 p-3 rounded-lg mb-6">
-              {error}
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'flex-start',
+                gap: '0.625rem',
+                padding: '0.75rem',
+                background: 'rgba(239, 68, 68, 0.08)',
+                border: '1px solid rgba(239, 68, 68, 0.25)',
+                borderRadius: 8,
+                marginBottom: '1.25rem',
+              }}
+            >
+              <i className="fas fa-circle-exclamation" style={{ color: '#ef4444', fontSize: '0.8rem', marginTop: 2 }} />
+              <p style={{ margin: 0, fontSize: '0.8125rem', color: '#fca5a5', fontFamily: 'Inter, sans-serif' }}>{error}</p>
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Form */}
+          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+
+            {/* Username (register only) */}
             {isRegistering && (
-              <div>
-                <label htmlFor="username" className="block text-sm font-medium text-slate-300 mb-2">
-                  Username <span className="text-slate-500 text-xs">(your public URL: /u/username)</span>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
+                <label
+                  htmlFor="username"
+                  style={{ fontSize: '0.8125rem', fontWeight: 500, color: '#d4d4d8', fontFamily: 'Inter, sans-serif' }}
+                >
+                  Username
+                  <span style={{ color: '#71717a', fontWeight: 400, marginLeft: '0.375rem', fontSize: '0.75rem' }}>
+                    → /u/username
+                  </span>
                 </label>
-                <div className="relative">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm">@</span>
+                <div style={{ position: 'relative' }}>
+                  <span
+                    style={{
+                      position: 'absolute',
+                      left: '0.75rem',
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      color: '#52525b',
+                      fontSize: '0.875rem',
+                      fontFamily: 'JetBrains Mono, monospace',
+                      pointerEvents: 'none',
+                    }}
+                  >
+                    @
+                  </span>
                   <input
-                    type="text"
                     id="username"
                     name="username"
+                    type="text"
                     value={formData.username}
                     onChange={e => setFormData(prev => ({ ...prev, username: e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, '') }))}
-                    className="w-full pl-8 pr-4 py-3 bg-slate-700 border border-slate-600 rounded-lg focus:outline-none focus:border-blue-500 text-white font-mono transition-colors duration-300"
                     placeholder="johndoe"
+                    style={{ ...inputStyle, paddingLeft: '1.875rem', fontFamily: 'JetBrains Mono, monospace' }}
+                    onFocus={focusInput}
+                    onBlur={blurInput}
                   />
                 </div>
-                <p className="text-slate-500 text-xs mt-1">Letters, numbers and underscore only. Auto-generated if left blank.</p>
+                <p style={{ margin: 0, fontSize: '0.75rem', color: '#52525b', fontFamily: 'Inter, sans-serif' }}>
+                  Letters, numbers and underscore only. Auto-generated if blank.
+                </p>
               </div>
             )}
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-slate-300 mb-2">
-                Email
+
+            {/* Email */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
+              <label
+                htmlFor="email"
+                style={{ fontSize: '0.8125rem', fontWeight: 500, color: '#d4d4d8', fontFamily: 'Inter, sans-serif' }}
+              >
+                Email address
               </label>
               <input
-                type="email"
                 id="email"
                 name="email"
+                type="email"
                 value={formData.email}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-lg focus:outline-none focus:border-blue-500 text-white transition-colors duration-300"
-                placeholder="your.email@example.com"
+                placeholder="you@example.com"
+                style={inputStyle}
+                onFocus={focusInput}
+                onBlur={blurInput}
               />
             </div>
-            
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-slate-300 mb-2">
+
+            {/* Password */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
+              <label
+                htmlFor="password"
+                style={{ fontSize: '0.8125rem', fontWeight: 500, color: '#d4d4d8', fontFamily: 'Inter, sans-serif' }}
+              >
                 Password
               </label>
               <input
-                type="password"
                 id="password"
                 name="password"
+                type="password"
                 value={formData.password}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-lg focus:outline-none focus:border-blue-500 text-white transition-colors duration-300"
-                placeholder="•••••••••"
+                placeholder="••••••••"
+                style={inputStyle}
+                onFocus={focusInput}
+                onBlur={blurInput}
               />
             </div>
-            
+
+            {/* Submit */}
             <button
               type="submit"
               disabled={loading}
-              className="w-full px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-medium rounded-lg hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '0.5rem',
+                width: '100%',
+                height: '2.375rem',
+                marginTop: '0.25rem',
+                background: loading ? '#059669' : '#00ff88',
+                color: '#fff',
+                border: 'none',
+                borderRadius: 8,
+                fontFamily: 'Inter, sans-serif',
+                fontWeight: 500,
+                fontSize: '0.875rem',
+                cursor: loading ? 'not-allowed' : 'pointer',
+                opacity: loading ? 0.8 : 1,
+                transition: 'opacity 0.15s ease',
+              }}
             >
               {loading ? (
-                <span className="flex items-center justify-center">
-                  <i className="fas fa-spinner fa-spin mr-2"></i>
-                  {isRegistering ? 'Creating Account...' : 'Signing In...'}
-                </span>
+                <>
+                  <div style={{
+                    width: 14, height: 14,
+                    border: '2px solid rgba(255,255,255,0.3)',
+                    borderTopColor: '#fff',
+                    borderRadius: '50%',
+                    animation: 'spin 0.8s linear infinite',
+                  }} />
+                  {isRegistering ? 'Creating account…' : 'Signing in…'}
+                </>
               ) : (
-                <span>{isRegistering ? 'Create Account' : 'Sign In'}</span>
+                isRegistering ? 'Create account' : 'Sign in'
               )}
             </button>
           </form>
-          
-          <div className="mt-6 text-center">
-            <p className="text-slate-400">
-              {isRegistering ? 'Already have an account?' : "Don't have an account?"}{' '}
-              <button
-                type="button"
-                onClick={() => setIsRegistering(!isRegistering)}
-                className="text-blue-400 hover:text-blue-300 transition-colors duration-300"
-              >
-                {isRegistering ? 'Sign In' : 'Sign Up'}
-              </button>
-            </p>
-          </div>
-          
-          <div className="mt-6 text-center">
-            <Link to="/" className="text-slate-400 hover:text-white transition-colors duration-300">
-              <i className="fas fa-arrow-left mr-2"></i>
-              Back to Portfolio
-            </Link>
-          </div>
+
+          {/* Toggle register/login */}
+          <p
+            style={{
+              marginTop: '1.25rem',
+              textAlign: 'center',
+              fontSize: '0.8125rem',
+              color: '#71717a',
+              fontFamily: 'Inter, sans-serif',
+            }}
+          >
+            {isRegistering ? 'Already have an account?' : "Don't have an account?"}{' '}
+            <button
+              type="button"
+              onClick={() => { setIsRegistering(!isRegistering); setError(''); }}
+              style={{
+                background: 'none',
+                border: 'none',
+                padding: 0,
+                color: '#00ff88',
+                fontFamily: 'Inter, sans-serif',
+                fontSize: '0.8125rem',
+                fontWeight: 500,
+                cursor: 'pointer',
+                textDecoration: 'underline',
+                textDecorationColor: 'rgba(16, 185, 129, 0.35)',
+              }}
+            >
+              {isRegistering ? 'Sign in' : 'Sign up'}
+            </button>
+          </p>
+        </div>
+
+        {/* Back link */}
+        <div style={{ textAlign: 'center' }}>
+          <Link
+            to="/"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.375rem',
+              fontSize: '0.8125rem',
+              color: '#52525b',
+              textDecoration: 'none',
+              transition: 'color 0.15s ease',
+              fontFamily: 'Inter, sans-serif',
+            }}
+            onMouseEnter={(e) => { e.currentTarget.style.color = '#a1a1aa'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.color = '#52525b'; }}
+          >
+            <i className="fas fa-arrow-left" style={{ fontSize: '0.75rem' }} />
+            Back to portfolio
+          </Link>
         </div>
       </div>
     </div>

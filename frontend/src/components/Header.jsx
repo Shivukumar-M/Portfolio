@@ -8,153 +8,286 @@ const Header = () => {
   const { isAuthenticated, user, logout } = useAuth();
 
   useEffect(() => {
-    const handleScroll = () => {
-      if (window.scrollY > 50) {
-        setScrolled(true);
-      } else {
-        setScrolled(false);
-      }
-    };
-
+    const handleScroll = () => setScrolled(window.scrollY > 50);
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   const handleLogout = () => {
     logout();
-    // Force a page reload to ensure all components update
     window.location.href = '/';
   };
 
   const navLinks = [
-    { name: 'Home', href: '#home' },
-    { name: 'About', href: '#about' },
-    { name: 'Skills', href: '#skills' },
+    { name: 'Home',     href: '#home' },
+    { name: 'About',    href: '#about' },
+    { name: 'Skills',   href: '#skills' },
     { name: 'Projects', href: '#projects' },
-    { name: 'Contact', href: '#contact' },
+    { name: 'Contact',  href: '#contact' },
   ];
 
   return (
     <header
-      className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${
-        scrolled ? 'bg-slate-900/90 backdrop-blur-md py-3 border-b border-slate-800' : 'bg-transparent py-5'
-      }`}
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        width: '100%',
+        zIndex: 50,
+        transition: 'all 0.3s ease',
+        background: scrolled
+          ? 'rgba(9, 9, 11, 0.85)'
+          : 'transparent',
+        backdropFilter: scrolled ? 'blur(12px)' : 'none',
+        WebkitBackdropFilter: scrolled ? 'blur(12px)' : 'none',
+        borderBottom: scrolled ? '1px solid #27272a' : '1px solid transparent',
+        padding: scrolled ? '0.75rem 0' : '1.25rem 0',
+      }}
     >
-      <div className="container mx-auto px-4">
-        <div className="flex justify-between items-center">
-          <div className="flex items-center space-x-2">
-            <div className="w-10 h-10 rounded-lg bg-blue-500 flex items-center justify-center">
-              <span className="text-white font-bold text-xl">P</span>
-            </div>
-            <span className="text-xl font-bold text-white">
-              {isAuthenticated && user ? `${user.email.split('@')[0]}'s Portfolio` : 'Portfolio'}
-            </span>
-          </div>
+      <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 1.5rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-8">
+          {/* Logo */}
+          <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', textDecoration: 'none' }}>
+            <div
+              style={{
+                width: 32,
+                height: 32,
+                borderRadius: 8,
+                background: 'linear-gradient(135deg, #00ff88, #00d4ff)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0,
+                boxShadow: '0 0 12px rgba(0,255,136,0.35)',
+              }}
+            >
+              <span style={{ color: '#000', fontWeight: 700, fontSize: '0.9rem', fontFamily: 'Inter, sans-serif' }}>S</span>
+            </div>
+            <span
+              className="gradient-text"
+              style={{
+                fontWeight: 700,
+                fontSize: '0.9375rem',
+                letterSpacing: '-0.01em',
+                fontFamily: 'Inter, sans-serif',
+              }}
+            >
+              {isAuthenticated && user ? `${user.email.split('@')[0]}` : 'Portfolio'}
+            </span>
+          </Link>
+
+          {/* Desktop nav */}
+          <nav style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }} className="hidden-mobile">
             {navLinks.map((link) => (
               <a
                 key={link.name}
                 href={link.href}
-                className="text-slate-300 hover:text-white transition-colors duration-300 relative group"
+                className="nav-link-ul"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  height: 32,
+                  padding: '0 0.75rem',
+                  borderRadius: 6,
+                  color: '#a1a1aa',
+                  fontSize: '0.875rem',
+                  fontWeight: 500,
+                  textDecoration: 'none',
+                  transition: 'color 0.2s ease',
+                }}
+                onMouseEnter={(e) => { e.currentTarget.style.color = '#00ff88'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.color = '#a1a1aa'; }}
               >
                 {link.name}
-                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-blue-500 group-hover:w-full transition-all duration-300"></span>
               </a>
             ))}
-            
+
+            {/* Separator */}
+            <div style={{ width: 1, height: 20, background: '#27272a', margin: '0 0.5rem' }} />
+
             {isAuthenticated ? (
-              <div className="flex items-center space-x-4">
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
                 <Link
                   to="/dashboard"
-                  className="text-slate-300 hover:text-white transition-colors duration-300"
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '0.375rem',
+                    height: 32,
+                    padding: '0 0.75rem',
+                    borderRadius: 6,
+                    color: '#a1a1aa',
+                    fontSize: '0.875rem',
+                    fontWeight: 500,
+                    textDecoration: 'none',
+                    transition: 'color 0.15s ease, background 0.15s ease',
+                  }}
+                  onMouseEnter={(e) => { e.currentTarget.style.color = '#fafafa'; e.currentTarget.style.background = '#27272a'; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.color = '#a1a1aa'; e.currentTarget.style.background = 'transparent'; }}
                 >
-                  <i className="fas fa-cog mr-2"></i>
+                  <i className="fas fa-gauge-high" style={{ fontSize: '0.75rem' }} />
                   Dashboard
                 </Link>
                 <button
                   onClick={handleLogout}
-                  className="text-slate-300 hover:text-white transition-colors duration-300"
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '0.375rem',
+                    height: 32,
+                    padding: '0 0.75rem',
+                    borderRadius: 6,
+                    background: 'transparent',
+                    border: 'none',
+                    color: '#a1a1aa',
+                    fontSize: '0.875rem',
+                    fontWeight: 500,
+                    cursor: 'pointer',
+                    transition: 'color 0.15s ease, background 0.15s ease',
+                  }}
+                  onMouseEnter={(e) => { e.currentTarget.style.color = '#fafafa'; e.currentTarget.style.background = '#27272a'; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.color = '#a1a1aa'; e.currentTarget.style.background = 'transparent'; }}
                 >
-                  <i className="fas fa-sign-out-alt mr-2"></i>
+                  <i className="fas fa-arrow-right-from-bracket" style={{ fontSize: '0.75rem' }} />
                   Logout
                 </button>
               </div>
             ) : (
-              <Link
-                to="/login"
-                className="btn-primary"
-              >
-                Login
+              <Link to="/login" className="btn-primary" style={{ height: 32, fontSize: '0.875rem' }}>
+                Sign in
               </Link>
             )}
           </nav>
 
-          {/* Mobile Menu Button */}
+          {/* Mobile hamburger */}
           <button
-            className="md:hidden text-white focus:outline-none"
             onClick={() => setMenuOpen(!menuOpen)}
+            style={{
+              display: 'none',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: 36,
+              height: 36,
+              borderRadius: 8,
+              background: 'transparent',
+              border: '1px solid #27272a',
+              color: '#a1a1aa',
+              cursor: 'pointer',
+            }}
+            className="show-mobile"
+            aria-label="Toggle menu"
           >
-            <i className={`fas ${menuOpen ? 'fa-times' : 'fa-bars'} text-xl`}></i>
+            <i className={`fas ${menuOpen ? 'fa-xmark' : 'fa-bars'}`} style={{ fontSize: '0.875rem' }} />
           </button>
         </div>
 
-        {/* Mobile Navigation */}
-        <div
-          className={`md:hidden transition-all duration-300 overflow-hidden ${
-            menuOpen ? 'max-h-96 mt-4' : 'max-h-0'
-          }`}
-        >
-          <div className="bg-slate-900/90 backdrop-blur-md rounded-lg p-4 border border-slate-800">
-            <ul className="space-y-3">
+        {/* Mobile menu */}
+        {menuOpen && (
+          <div
+            style={{
+              marginTop: '0.75rem',
+              padding: '0.75rem',
+              background: '#18181b',
+              border: '1px solid #27272a',
+              borderRadius: 10,
+            }}
+          >
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.125rem' }}>
               {navLinks.map((link) => (
-                <li key={link.name}>
-                  <a
-                    href={link.href}
-                    className="block text-slate-300 hover:text-white transition-colors duration-300"
-                    onClick={() => setMenuOpen(false)}
-                  >
-                    {link.name}
-                  </a>
-                </li>
+                <a
+                  key={link.name}
+                  href={link.href}
+                  onClick={() => setMenuOpen(false)}
+                  style={{
+                    display: 'block',
+                    padding: '0.5rem 0.75rem',
+                    borderRadius: 6,
+                    color: '#a1a1aa',
+                    fontSize: '0.875rem',
+                    fontWeight: 500,
+                    textDecoration: 'none',
+                  }}
+                  onMouseEnter={(e) => { e.currentTarget.style.color = '#fafafa'; e.currentTarget.style.background = '#27272a'; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.color = '#a1a1aa'; e.currentTarget.style.background = 'transparent'; }}
+                >
+                  {link.name}
+                </a>
               ))}
-              <li>
-                {isAuthenticated ? (
-                  <>
-                    <Link
-                      to="/dashboard"
-                      className="block text-slate-300 hover:text-white transition-colors duration-300 mb-3"
-                      onClick={() => setMenuOpen(false)}
-                    >
-                      <i className="fas fa-cog mr-2"></i>
-                      Dashboard
-                    </Link>
-                    <button
-                      onClick={() => {
-                        handleLogout();
-                        setMenuOpen(false);
-                      }}
-                      className="block text-slate-300 hover:text-white transition-colors duration-300 w-full text-left"
-                    >
-                      <i className="fas fa-sign-out-alt mr-2"></i>
-                      Logout
-                    </button>
-                  </>
-                ) : (
+
+              <div style={{ height: 1, background: '#27272a', margin: '0.375rem 0' }} />
+
+              {isAuthenticated ? (
+                <>
                   <Link
-                    to="/login"
-                    className="btn-primary text-center block"
+                    to="/dashboard"
                     onClick={() => setMenuOpen(false)}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.5rem',
+                      padding: '0.5rem 0.75rem',
+                      borderRadius: 6,
+                      color: '#a1a1aa',
+                      fontSize: '0.875rem',
+                      fontWeight: 500,
+                      textDecoration: 'none',
+                    }}
+                    onMouseEnter={(e) => { e.currentTarget.style.color = '#fafafa'; e.currentTarget.style.background = '#27272a'; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.color = '#a1a1aa'; e.currentTarget.style.background = 'transparent'; }}
                   >
-                    Login
+                    <i className="fas fa-gauge-high" style={{ fontSize: '0.75rem' }} />
+                    Dashboard
                   </Link>
-                )}
-              </li>
-            </ul>
+                  <button
+                    onClick={() => { handleLogout(); setMenuOpen(false); }}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.5rem',
+                      width: '100%',
+                      padding: '0.5rem 0.75rem',
+                      borderRadius: 6,
+                      background: 'transparent',
+                      border: 'none',
+                      color: '#a1a1aa',
+                      fontSize: '0.875rem',
+                      fontWeight: 500,
+                      cursor: 'pointer',
+                      textAlign: 'left',
+                    }}
+                    onMouseEnter={(e) => { e.currentTarget.style.color = '#fafafa'; e.currentTarget.style.background = '#27272a'; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.color = '#a1a1aa'; e.currentTarget.style.background = 'transparent'; }}
+                  >
+                    <i className="fas fa-arrow-right-from-bracket" style={{ fontSize: '0.75rem' }} />
+                    Logout
+                  </button>
+                </>
+              ) : (
+                <Link
+                  to="/login"
+                  className="btn-primary"
+                  onClick={() => setMenuOpen(false)}
+                  style={{ justifyContent: 'center', marginTop: '0.25rem' }}
+                >
+                  Sign in
+                </Link>
+              )}
+            </div>
           </div>
-        </div>
+        )}
       </div>
+
+      <style>{`
+        @media (min-width: 768px) {
+          .hidden-mobile { display: flex !important; }
+          .show-mobile   { display: none !important; }
+        }
+        @media (max-width: 767px) {
+          .hidden-mobile { display: none !important; }
+          .show-mobile   { display: flex !important; }
+        }
+      `}</style>
     </header>
   );
 };

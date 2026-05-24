@@ -2,47 +2,121 @@ import React from 'react';
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
-  
+
   const quickLinks = [
-    { name: 'Home', href: '#home' },
-    { name: 'About', href: '#about' },
-    { name: 'Skills', href: '#skills' },
+    { name: 'Home',     href: '#home' },
+    { name: 'About',    href: '#about' },
+    { name: 'Skills',   href: '#skills' },
     { name: 'Projects', href: '#projects' },
-    { name: 'Contact', href: '#contact' },
-  ];
-  
-  const socialLinks = [
-    { name: 'GitHub', icon: 'fab fa-github', url: 'https://github.com/Shivukumar-M' },
-    { name: 'LinkedIn', icon: 'fab fa-linkedin', url: '#' },
-    { name: 'Twitter', icon: 'fab fa-twitter', url: '#' },
+    { name: 'Contact',  href: '#contact' },
   ];
 
+  const socialLinks = [
+    { name: 'GitHub',   icon: 'fab fa-github',   url: 'https://github.com/Shivukumar-M' },
+    { name: 'LinkedIn', icon: 'fab fa-linkedin',  url: 'https://www.linkedin.com/in/shivu-kumar-a-m' },
+  ];
+
+  const linkStyle = {
+    display: 'block',
+    fontSize: '0.875rem',
+    color: '#71717a',
+    textDecoration: 'none',
+    padding: '0.125rem 0',
+    transition: 'color 0.15s ease',
+    fontFamily: 'Inter, sans-serif',
+  };
+
   return (
-    <footer className="bg-slate-900 border-t border-slate-800 py-12 px-4">
-      <div className="container mx-auto max-w-6xl">
-        <div className="grid md:grid-cols-4 gap-8">
+    <footer
+      style={{
+        background: '#09090b',
+        borderTop: '1px solid #27272a',
+        padding: '3.5rem 1.5rem 2rem',
+      }}
+    >
+      <div style={{ maxWidth: 1200, margin: '0 auto' }}>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+            gap: '2.5rem',
+            marginBottom: '2.5rem',
+          }}
+        >
           {/* Brand */}
-          <div>
-            <div className="flex items-center space-x-2 mb-4">
-              <div className="w-10 h-10 rounded-lg bg-blue-500 flex items-center justify-center">
-                <span className="text-white font-bold text-xl">S</span>
+          <div style={{ gridColumn: 'span 1' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', marginBottom: '0.875rem' }}>
+              <div
+                style={{
+                  width: 32,
+                  height: 32,
+                  borderRadius: 8,
+                  background: '#00ff88',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0,
+                }}
+              >
+                <span style={{ color: '#fff', fontWeight: 700, fontSize: '0.9rem', fontFamily: 'Inter, sans-serif' }}>S</span>
               </div>
-              <span className="text-xl font-bold text-white">Shivukumar</span>
+              <span style={{ color: '#fafafa', fontWeight: 600, fontSize: '0.9375rem', letterSpacing: '-0.01em', fontFamily: 'Inter, sans-serif' }}>
+                Shivukumar
+              </span>
             </div>
-            <p className="text-slate-400 text-sm">
-              Full Stack Developer passionate about creating elegant solutions to complex problems.
+            <p style={{ margin: '0 0 1rem', fontSize: '0.8125rem', color: '#52525b', lineHeight: 1.7, fontFamily: 'Inter, sans-serif', maxWidth: 220 }}>
+              Linux Engineer · Full Stack Developer · Security Enthusiast
             </p>
+            <div
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.375rem',
+                padding: '0.25rem 0.625rem',
+                background: '#052e16',
+                border: '1px solid rgba(0,255,136,0.3)',
+                borderRadius: 999,
+                fontFamily: 'JetBrains Mono, monospace',
+                fontSize: '0.65rem',
+                color: '#00ff88',
+              }}
+            >
+              <span
+                style={{
+                  width: 6,
+                  height: 6,
+                  borderRadius: '50%',
+                  background: '#00ff88',
+                  flexShrink: 0,
+                  animation: 'blink 1.5s step-end infinite',
+                }}
+              />
+              Open to opportunities
+            </div>
           </div>
-          
-          {/* Quick Links */}
+
+          {/* Quick links */}
           <div>
-            <h3 className="text-lg font-semibold mb-4 text-white">Quick Links</h3>
-            <ul className="space-y-2">
+            <h4
+              style={{
+                margin: '0 0 1rem',
+                fontSize: '0.8125rem',
+                fontWeight: 600,
+                color: '#d4d4d8',
+                letterSpacing: '-0.005em',
+                fontFamily: 'Inter, sans-serif',
+              }}
+            >
+              Navigation
+            </h4>
+            <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
               {quickLinks.map((link) => (
                 <li key={link.name}>
                   <a
                     href={link.href}
-                    className="text-slate-400 hover:text-white transition-colors duration-300"
+                    style={linkStyle}
+                    onMouseEnter={(e) => { e.currentTarget.style.color = '#d4d4d8'; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.color = '#71717a'; }}
                   >
                     {link.name}
                   </a>
@@ -50,47 +124,104 @@ const Footer = () => {
               ))}
             </ul>
           </div>
-          
+
           {/* Services */}
           <div>
-            <h3 className="text-lg font-semibold mb-4 text-white">Services</h3>
-            <ul className="space-y-2">
-              <li className="text-slate-400">Web Development</li>
-              <li className="text-slate-400">UI/UX Design</li>
-              <li className="text-slate-400">API Development</li>
-              <li className="text-slate-400">Database Design</li>
+            <h4
+              style={{
+                margin: '0 0 1rem',
+                fontSize: '0.8125rem',
+                fontWeight: 600,
+                color: '#d4d4d8',
+                letterSpacing: '-0.005em',
+                fontFamily: 'Inter, sans-serif',
+              }}
+            >
+              Services
+            </h4>
+            <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
+              {['Web Development', 'Security Auditing', 'API Design', 'Linux Automation'].map((s) => (
+                <li key={s} style={{ fontSize: '0.875rem', color: '#52525b', fontFamily: 'Inter, sans-serif', padding: '0.125rem 0' }}>
+                  {s}
+                </li>
+              ))}
             </ul>
           </div>
-          
-          {/* Social Links */}
+
+          {/* Connect */}
           <div>
-            <h3 className="text-lg font-semibold mb-4 text-white">Connect</h3>
-            <div className="flex space-x-4 mb-4">
+            <h4
+              style={{
+                margin: '0 0 1rem',
+                fontSize: '0.8125rem',
+                fontWeight: 600,
+                color: '#d4d4d8',
+                letterSpacing: '-0.005em',
+                fontFamily: 'Inter, sans-serif',
+              }}
+            >
+              Connect
+            </h4>
+            <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
               {socialLinks.map((link) => (
                 <a
                   key={link.name}
                   href={link.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-10 h-10 bg-slate-800 rounded-full flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-700 transition-all duration-300 border border-slate-700"
                   aria-label={link.name}
+                  style={{
+                    width: 34,
+                    height: 34,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    borderRadius: 8,
+                    background: '#18181b',
+                    border: '1px solid #27272a',
+                    color: '#71717a',
+                    textDecoration: 'none',
+                    fontSize: '0.875rem',
+                    transition: 'color 0.15s ease, border-color 0.15s ease',
+                  }}
+                  onMouseEnter={(e) => { e.currentTarget.style.color = '#00ff88'; e.currentTarget.style.borderColor = 'rgba(0,255,136,0.4)'; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.color = '#71717a'; e.currentTarget.style.borderColor = '#27272a'; }}
                 >
-                  <i className={link.icon}></i>
+                  <i className={link.icon} />
                 </a>
               ))}
             </div>
-            <p className="text-slate-400 text-sm">
-              your.email@example.com
+            <p style={{ margin: 0, fontSize: '0.8125rem', color: '#52525b', fontFamily: 'JetBrains Mono, monospace' }}>
+              shivukumar.vercel.app
             </p>
           </div>
         </div>
-        
-        <div className="mt-12 pt-8 border-t border-slate-800 flex flex-col md:flex-row justify-between items-center">
-          <p className="text-slate-400 text-sm mb-4 md:mb-0">
+
+        {/* Bottom bar */}
+        <div
+          style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '0.75rem',
+            paddingTop: '1.5rem',
+            borderTop: '1px solid #27272a',
+          }}
+        >
+          <p style={{ margin: 0, fontSize: '0.8125rem', color: '#52525b', fontFamily: 'Inter, sans-serif' }}>
             © {currentYear} Shivukumar M. All rights reserved.
           </p>
-          <p className="text-slate-400 text-sm">
-            Built with React, Node.js, Express, and MongoDB
+          <p
+            style={{
+              margin: 0,
+              fontSize: '0.75rem',
+              color: '#3f3f46',
+              fontFamily: 'JetBrains Mono, monospace',
+              letterSpacing: '0.02em',
+            }}
+          >
+            React · Node.js · MongoDB
           </p>
         </div>
       </div>

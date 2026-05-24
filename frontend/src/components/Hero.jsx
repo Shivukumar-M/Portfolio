@@ -71,30 +71,44 @@ const Hero = () => {
       id="home"
       ref={heroRef}
       className="min-h-screen flex items-center pt-20 relative overflow-hidden"
-      style={{ background: '#151515' }}
+      style={{ background: '#09090b' }}
     >
-      {/* ── 2-color gradient: emerald top-right + amber bottom-left ── */}
+      {/* Neon parallax atmosphere */}
+      <div className="absolute inset-0 pointer-events-none parallax-atmosphere" />
       <div className="absolute inset-0 pointer-events-none">
+        {/* Neon green top-right */}
         <div
           className="absolute"
           style={{
             top: '-10%', right: '-5%',
-            width: 600, height: 600,
+            width: 650, height: 650,
             borderRadius: '50%',
-            background: 'radial-gradient(circle, rgba(16,185,129,0.12) 0%, transparent 65%)',
-            filter: 'blur(60px)',
+            background: 'radial-gradient(circle, rgba(0,255,136,0.14) 0%, transparent 65%)',
+            filter: 'blur(55px)',
             transform: `translateY(${scrollY * 0.15}px)`,
           }}
         />
+        {/* Cyan bottom-left */}
         <div
           className="absolute"
           style={{
             bottom: '-5%', left: '-5%',
             width: 550, height: 550,
             borderRadius: '50%',
-            background: 'radial-gradient(circle, rgba(74,43,17,0.30) 0%, transparent 65%)',
-            filter: 'blur(70px)',
+            background: 'radial-gradient(circle, rgba(0,212,255,0.10) 0%, transparent 65%)',
+            filter: 'blur(65px)',
             transform: `translateY(${scrollY * -0.10}px)`,
+          }}
+        />
+        {/* Magenta center-top accent */}
+        <div
+          className="absolute"
+          style={{
+            top: '15%', left: '38%',
+            width: 320, height: 320,
+            borderRadius: '50%',
+            background: 'radial-gradient(circle, rgba(255,0,255,0.05) 0%, transparent 70%)',
+            filter: 'blur(50px)',
           }}
         />
       </div>
@@ -103,7 +117,7 @@ const Hero = () => {
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
-          backgroundImage: 'linear-gradient(rgba(255,255,255,0.018) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.018) 1px, transparent 1px)',
+          backgroundImage: 'linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px)',
           backgroundSize: '52px 52px',
           transform: `translateY(${scrollY * 0.05}px)`,
         }}
@@ -114,20 +128,21 @@ const Hero = () => {
 
           {/* ── LEFT ── */}
           <div className="fade-in">
-            {/* Eyebrow */}
+            {/* Eyebrow badge */}
             <div
               className="inline-flex items-center gap-2 px-3 py-1.5 rounded mb-6"
               style={{
-                background: '#0e352c',
-                border: '1px solid rgba(16,185,129,0.35)',
+                background: '#052e16',
+                border: '1px solid rgba(0,255,136,0.30)',
                 fontFamily: '"JetBrains Mono", monospace',
-                fontSize: '0.7rem',
-                color: '#10b981',
+                fontSize: '0.68rem',
+                color: '#00ff88',
+                borderRadius: 6,
               }}
             >
               <span
                 className="w-1.5 h-1.5 rounded-full"
-                style={{ background: '#10b981', animation: 'blink 1.3s step-end infinite' }}
+                style={{ background: '#00ff88', animation: 'blink 1.3s step-end infinite', flexShrink: 0 }}
               />
               SYSTEM IDENTITY INITIALIZED
             </div>
@@ -136,10 +151,10 @@ const Hero = () => {
             <h1
               style={{
                 fontSize: 'clamp(2.2rem, 5vw, 3.8rem)',
-                fontWeight: 300,
-                letterSpacing: '-0.022em',
-                lineHeight: 1.0,
-                color: '#e9ebdf',
+                fontWeight: 600,
+                letterSpacing: '-0.030em',
+                lineHeight: 1.05,
+                color: '#fafafa',
                 fontFamily: 'Inter, sans-serif',
                 marginBottom: '1rem',
               }}
@@ -150,13 +165,13 @@ const Hero = () => {
             {/* Typing role */}
             <div
               className="mb-5 min-h-[1.6em]"
-              style={{ fontFamily: '"JetBrains Mono", monospace', fontSize: '0.95rem', color: '#94958e' }}
+              style={{ fontFamily: '"JetBrains Mono", monospace', fontSize: '0.9rem', color: '#71717a' }}
             >
-              <span style={{ color: '#10b981' }}>{text}</span>
-              <span style={{ color: '#10b981', animation: 'blink 1s step-end infinite' }}>_</span>
+              <span style={{ color: '#00ff88' }}>{text}</span>
+              <span style={{ color: '#00ff88', animation: 'blink 1s step-end infinite' }}>_</span>
             </div>
 
-            {/* Three pillars — single color */}
+            {/* Pillars */}
             <div className="flex flex-wrap gap-2 mb-6">
               {['🐧 Linux', '🌐 Web Dev', '🔐 Security'].map((label) => (
                 <span
@@ -164,13 +179,13 @@ const Hero = () => {
                   className="px-3 py-1 text-xs cursor-default transition-all duration-200"
                   style={{
                     fontFamily: '"JetBrains Mono", monospace',
-                    background: '#242424',
-                    border: '1px solid #3f403d',
-                    borderRadius: '4px',
-                    color: '#cbccc4',
+                    background: '#18181b',
+                    border: '1px solid #27272a',
+                    borderRadius: 6,
+                    color: '#a1a1aa',
                   }}
-                  onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#10b981'; e.currentTarget.style.color = '#10b981'; }}
-                  onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#3f403d'; e.currentTarget.style.color = '#cbccc4'; }}
+                  onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'rgba(0,255,136,0.45)'; e.currentTarget.style.color = '#00ff88'; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#27272a'; e.currentTarget.style.color = '#a1a1aa'; }}
                 >
                   {label}
                 </span>
@@ -179,35 +194,38 @@ const Hero = () => {
 
             <p
               className="mb-8 max-w-md leading-relaxed"
-              style={{ color: '#94958e', fontSize: '0.9rem', lineHeight: 1.7 }}
+              style={{ color: '#71717a', fontSize: '0.9rem', lineHeight: 1.75 }}
             >
               {profile.bio}
             </p>
 
             {/* CTAs */}
             <div className="flex flex-wrap items-center gap-3 mb-8">
-              <a href="#projects" className="btn-primary">View My Work</a>
-              <a href="#contact" className="btn-secondary">Contact Me</a>
+              <a href="#projects" className="btn-neon-filled">View my work</a>
+              <a href="#contact" className="btn-neon">Contact me</a>
               <a
                 href={PORTFOLIO_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 text-xs"
                 style={{
-                  color: '#8b867f',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.375rem',
+                  fontSize: '0.75rem',
+                  color: '#52525b',
                   textDecoration: 'none',
                   fontFamily: '"JetBrains Mono", monospace',
-                  transition: 'color 0.2s',
+                  transition: 'color 0.15s ease',
                 }}
-                onMouseEnter={(e) => { e.currentTarget.style.color = '#10b981'; }}
-                onMouseLeave={(e) => { e.currentTarget.style.color = '#8b867f'; }}
+                onMouseEnter={(e) => { e.currentTarget.style.color = '#00ff88'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.color = '#52525b'; }}
               >
-                <i className="fas fa-globe" style={{ fontSize: 10 }} />
+                <i className="fas fa-globe" style={{ fontSize: 9 }} />
                 shivukumar.vercel.app ↗
               </a>
             </div>
 
-            {/* Social */}
+            {/* Social icons */}
             <div className="flex gap-2">
               {[
                 { href: profile.social?.github || 'https://github.com/Shivukumar-M', icon: 'fab fa-github', label: 'GitHub' },
@@ -221,15 +239,15 @@ const Hero = () => {
                   aria-label={label}
                   className="w-8 h-8 flex items-center justify-center text-sm"
                   style={{
-                    background: '#242424',
-                    border: '1px solid #3f403d',
-                    borderRadius: '6px',
-                    color: '#8b867f',
+                    background: '#18181b',
+                    border: '1px solid #27272a',
+                    borderRadius: 8,
+                    color: '#71717a',
                     textDecoration: 'none',
-                    transition: 'all 0.2s ease',
+                    transition: 'all 0.15s ease',
                   }}
-                  onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#10b981'; e.currentTarget.style.color = '#10b981'; }}
-                  onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#3f403d'; e.currentTarget.style.color = '#8b867f'; }}
+                  onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'rgba(0,255,136,0.45)'; e.currentTarget.style.color = '#00ff88'; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#27272a'; e.currentTarget.style.color = '#71717a'; }}
                 >
                   <i className={icon} />
                 </a>
@@ -249,9 +267,9 @@ const Hero = () => {
                 style={{
                   width: 300,
                   height: 360,
-                  borderRadius: '12px',
-                  border: '1px solid #3f403d',
-                  boxShadow: '0 0 0 1px rgba(16,185,129,0.06), 0 24px 60px rgba(0,0,0,0.55)',
+                  borderRadius: 14,
+                  border: '1px solid #27272a',
+                  boxShadow: '0 0 0 1px rgba(0,255,136,0.05), 0 24px 60px rgba(0,0,0,0.6)',
                 }}
               >
                 <img
@@ -261,46 +279,46 @@ const Hero = () => {
                 />
               </div>
 
-              {/* Active badge — bottom left */}
+              {/* Active badge */}
               <div
                 className="absolute bottom-4 left-4 flex items-center gap-2 px-3 py-1.5"
                 style={{
-                  background: '#0e352c',
-                  border: '1px solid rgba(16,185,129,0.4)',
-                  borderRadius: '6px',
+                  background: '#052e16',
+                  border: '1px solid rgba(0,255,136,0.35)',
+                  borderRadius: 8,
                   fontFamily: '"JetBrains Mono", monospace',
                   backdropFilter: 'blur(8px)',
                 }}
               >
                 <span
                   className="w-1.5 h-1.5 rounded-full"
-                  style={{ background: '#10b981', animation: 'blink 1.5s step-end infinite' }}
+                  style={{ background: '#00ff88', animation: 'blink 1.5s step-end infinite' }}
                 />
-                <span style={{ color: '#10b981', fontSize: '0.65rem' }}>● ACTIVE</span>
+                <span style={{ color: '#00ff88', fontSize: '0.65rem' }}>ACTIVE</span>
               </div>
 
-              {/* Name tag — top */}
+              {/* Name tag */}
               <div
                 className="absolute -top-3.5 left-1/2 px-3 py-1"
                 style={{
-                  background: '#242424',
-                  border: '1px solid #3f403d',
-                  borderRadius: '4px',
+                  background: '#18181b',
+                  border: '1px solid #27272a',
+                  borderRadius: 6,
                   transform: 'translateX(-50%)',
                   fontFamily: '"JetBrains Mono", monospace',
                   whiteSpace: 'nowrap',
                 }}
               >
-                <span style={{ color: '#cbccc4', fontSize: '0.68rem' }}>~/profile.yaml</span>
+                <span style={{ color: '#a1a1aa', fontSize: '0.68rem' }}>~/profile.yaml</span>
               </div>
 
-              {/* Floating emerald corner accent */}
+              {/* Corner accent */}
               <div
                 className="absolute -bottom-3 -right-3 w-10 h-10 flex items-center justify-center"
                 style={{
-                  background: '#242424',
-                  border: '1px solid rgba(16,185,129,0.35)',
-                  borderRadius: '8px',
+                  background: '#18181b',
+                  border: '1px solid rgba(0,255,136,0.30)',
+                  borderRadius: 10,
                   animation: 'float 5s ease-in-out infinite',
                   fontSize: '1.2rem',
                 }}
@@ -313,11 +331,11 @@ const Hero = () => {
 
         {/* Scroll hint */}
         <div className="flex justify-center mt-14">
-          <div className="flex flex-col items-center gap-2" style={{ opacity: 0.2 }}>
+          <div className="flex flex-col items-center gap-2" style={{ opacity: 0.18 }}>
             <span className="eyebrow" style={{ fontSize: '0.6rem' }}>scroll</span>
             <div
               className="w-px h-8"
-              style={{ background: 'linear-gradient(to bottom, #10b981, transparent)' }}
+              style={{ background: 'linear-gradient(to bottom, #00ff88, transparent)' }}
             />
           </div>
         </div>

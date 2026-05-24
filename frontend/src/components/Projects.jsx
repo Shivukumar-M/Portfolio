@@ -35,7 +35,7 @@ const defaultProjects = [
   {
     _id: 'p4', emoji: '🤖', title: 'SDIT / Gemini Automation',
     description: 'CLI & web automation for institutional workflows. Integrates Google Gemini API for intelligent task processing and reporting automation.',
-    technologies: ['Python', 'Node.js'], githubLink: 'https://github.com/Shivukumar-M', cardColor: '#10b981',
+    technologies: ['Python', 'Node.js'], githubLink: 'https://github.com/Shivukumar-M', cardColor: '#00ff88',
   },
   {
     _id: 'p5', emoji: '👁️', title: 'FaceCapture AI',
@@ -51,32 +51,32 @@ const defaultProjects = [
 
 function ProjectCard({ project, delay }) {
   const [ref, visible] = useReveal(0.06);
-  const color = project.cardColor || '#10b981';
+  const color = project.cardColor || '#00ff88';
 
   return (
     <div
       ref={ref}
-      className="rounded-xl overflow-hidden group"
+      className="shimmer-card rounded-xl overflow-hidden group"
       style={{
-        background: '#242424',
-        border: '1px solid #3f403d',
+        background: 'linear-gradient(135deg, rgba(26,26,26,0.95), rgba(10,10,10,0.95))',
+        border: '1px solid rgba(255,255,255,0.08)',
         opacity: visible ? 1 : 0,
         transform: visible ? 'none' : 'translateY(24px)',
         transition: `opacity 0.6s ease ${delay}ms, transform 0.6s ease ${delay}ms, border-color 0.25s ease, box-shadow 0.25s ease`,
       }}
       onMouseEnter={(e) => {
-        e.currentTarget.style.borderColor = `${color}55`;
-        e.currentTarget.style.boxShadow = `0 8px 40px rgba(0,0,0,0.5)`;
-        e.currentTarget.style.transform = 'translateY(-4px)';
+        e.currentTarget.style.borderColor = `${color}66`;
+        e.currentTarget.style.boxShadow = `0 10px 40px rgba(0,0,0,0.6), 0 0 20px ${color}22`;
+        e.currentTarget.style.transform = 'translateY(-5px)';
       }}
       onMouseLeave={(e) => {
-        e.currentTarget.style.borderColor = '#3f403d';
+        e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)';
         e.currentTarget.style.boxShadow = 'none';
         e.currentTarget.style.transform = 'none';
       }}
     >
       {/* Visual panel */}
-      <div className="h-40 relative overflow-hidden" style={{ background: '#151515' }}>
+      <div className="h-40 relative overflow-hidden" style={{ background: '#09090b' }}>
         {project.emoji ? (
           <div className="w-full h-full flex items-center justify-center text-5xl relative">
             {/* Grid overlay */}
@@ -117,7 +117,7 @@ function ProjectCard({ project, delay }) {
         <h3
           className="mb-2 transition-colors"
           style={{
-            color: '#e9ebdf',
+            color: '#fafafa',
             fontWeight: 600,
             fontSize: '0.9rem',
             letterSpacing: '-0.01em',
@@ -127,7 +127,7 @@ function ProjectCard({ project, delay }) {
         </h3>
         <p
           className="mb-4 leading-relaxed"
-          style={{ color: '#94958e', fontSize: '0.775rem', lineHeight: 1.65 }}
+          style={{ color: '#71717a', fontSize: '0.775rem', lineHeight: 1.65 }}
         >
           {project.description}
         </p>
@@ -139,9 +139,9 @@ function ProjectCard({ project, delay }) {
               key={`${project._id}-${tech}-${i}`}
               className="px-2 py-0.5 rounded text-xs"
               style={{
-                background: '#151515',
-                color: '#cbccc4',
-                border: '1px solid #3f403d',
+                background: '#09090b',
+                color: '#d4d4d8',
+                border: '1px solid #27272a',
                 fontFamily: '"JetBrains Mono", monospace',
                 fontSize: '0.68rem',
               }}
@@ -154,7 +154,7 @@ function ProjectCard({ project, delay }) {
         {/* Links */}
         <div
           className="h-px w-full mb-4"
-          style={{ background: '#3f403d' }}
+          style={{ background: '#27272a' }}
         />
         <div className="flex items-center gap-4">
           {project.githubLink && (
@@ -163,9 +163,9 @@ function ProjectCard({ project, delay }) {
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-1.5 text-xs transition-colors"
-              style={{ color: '#8b867f', textDecoration: 'none' }}
-              onMouseEnter={(e) => { e.currentTarget.style.color = '#e9ebdf'; }}
-              onMouseLeave={(e) => { e.currentTarget.style.color = '#8b867f'; }}
+              style={{ color: '#71717a', textDecoration: 'none' }}
+              onMouseEnter={(e) => { e.currentTarget.style.color = '#fafafa'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.color = '#71717a'; }}
             >
               <i className="fab fa-github" />
               <span>Code</span>
@@ -218,17 +218,17 @@ const Projects = () => {
 
   if (loading) {
     return (
-      <section id="projects" className="py-20 px-4" style={{ background: '#151515' }}>
+      <section id="projects" className="py-20 px-4" style={{ background: '#09090b' }}>
         <div className="container mx-auto max-w-6xl text-center">
           <div className="loading mx-auto mb-4" />
-          <p style={{ color: '#94958e', fontSize: '0.875rem' }}>Loading Projects…</p>
+          <p style={{ color: '#71717a', fontSize: '0.875rem' }}>Loading Projects…</p>
         </div>
       </section>
     );
   }
 
   return (
-    <section id="projects" className="py-20 px-4 relative overflow-hidden" style={{ background: '#151515' }}>
+    <section id="projects" className="py-20 px-4 relative overflow-hidden" style={{ background: '#09090b' }}>
       {/* Amber blob */}
       <div
         className="absolute pointer-events-none"
@@ -247,7 +247,7 @@ const Projects = () => {
         className="absolute inset-x-0 pointer-events-none"
         style={{
           height: 1,
-          background: 'linear-gradient(to right, transparent 0%, rgba(16,185,129,0.10) 50%, transparent 100%)',
+          background: 'linear-gradient(to right, transparent 0%, rgba(0,255,136,0.10) 50%, transparent 100%)',
           animation: 'scanDown 10s linear infinite',
           animationDelay: '4s',
           top: 0,
@@ -265,7 +265,7 @@ const Projects = () => {
           style={{
             left: p.x, top: p.y,
             width: p.s, height: p.s,
-            background: 'rgba(16,185,129,0.28)',
+            background: 'rgba(0,255,136,0.28)',
             animation: `float ${p.dur}s ease-in-out infinite`,
             animationDelay: `${p.d}s`,
           }}
@@ -282,18 +282,18 @@ const Projects = () => {
               fontSize: 'clamp(1.8rem, 3.5vw, 2.5rem)',
               fontWeight: 300,
               letterSpacing: '-0.014em',
-              color: '#e9ebdf',
+              color: '#fafafa',
               marginBottom: '1rem',
             }}
           >
             My <span className="gradient-text">Projects</span>
           </h2>
           <div className="flex items-center justify-center gap-3 mb-4">
-            <div className="h-px w-12" style={{ background: 'linear-gradient(to right, transparent, #3f403d)' }} />
-            <div className="w-1.5 h-1.5 rounded-full" style={{ background: '#10b981' }} />
-            <div className="h-px w-12" style={{ background: 'linear-gradient(to left, transparent, #3f403d)' }} />
+            <div className="h-px w-12" style={{ background: 'linear-gradient(to right, transparent, #27272a)' }} />
+            <div className="w-1.5 h-1.5 rounded-full" style={{ background: '#00ff88' }} />
+            <div className="h-px w-12" style={{ background: 'linear-gradient(to left, transparent, #27272a)' }} />
           </div>
-          <p style={{ color: '#94958e', fontSize: '0.875rem' }}>
+          <p style={{ color: '#71717a', fontSize: '0.875rem' }}>
             Spanning Linux tooling, web applications, and security utilities
           </p>
         </div>
@@ -302,7 +302,7 @@ const Projects = () => {
         <div className="flex justify-center mb-10">
           <div
             className="rounded-xl p-1 flex flex-wrap justify-center gap-1"
-            style={{ background: '#242424', border: '1px solid #3f403d' }}
+            style={{ background: '#18181b', border: '1px solid #27272a' }}
           >
             {techFilters.map((tech) => (
               <button
@@ -311,8 +311,8 @@ const Projects = () => {
                 className="px-4 py-1.5 rounded-lg capitalize text-sm transition-all duration-200"
                 style={
                   filter === tech
-                    ? { background: '#10b981', color: '#fff', fontWeight: 600 }
-                    : { color: '#94958e' }
+                    ? { background: 'linear-gradient(135deg, #00ff88, #00d4ff)', color: '#000', fontWeight: 700 }
+                    : { color: '#71717a' }
                 }
               >
                 {tech}
@@ -324,7 +324,7 @@ const Projects = () => {
         {filteredProjects.length === 0 ? (
           <p
             className="text-center py-12"
-            style={{ color: '#8b867f', fontFamily: '"JetBrains Mono", monospace', fontSize: '0.875rem' }}
+            style={{ color: '#71717a', fontFamily: '"JetBrains Mono", monospace', fontSize: '0.875rem' }}
           >
             No projects found matching: {filter}
           </p>

@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(xargs sed -i 's/#10b981/#00ff88/g; s/rgba\\(16,185,129/rgba\\(0,255,136/g')",
+      "Bash(npm run *)"
+    ]
+  }
+}

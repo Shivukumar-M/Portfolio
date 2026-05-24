@@ -75,19 +75,19 @@ function SkillChip({ name, icon }) {
     <div
       className="flex items-center gap-2 px-3 py-1.5 cursor-default transition-all duration-200"
       style={{
-        background: '#151515',
-        border: '1px solid #3f403d',
+        background: '#09090b',
+        border: '1px solid #27272a',
         borderRadius: '7px',
       }}
       onMouseEnter={(e) => {
-        e.currentTarget.style.borderColor = 'rgba(16,185,129,0.55)';
-        e.currentTarget.style.boxShadow = '0 0 12px rgba(16,185,129,0.1)';
+        e.currentTarget.style.borderColor = 'rgba(0,255,136,0.55)';
+        e.currentTarget.style.boxShadow = '0 0 12px rgba(0,255,136,0.1)';
         e.currentTarget.style.background = '#1a1a1a';
       }}
       onMouseLeave={(e) => {
-        e.currentTarget.style.borderColor = '#3f403d';
+        e.currentTarget.style.borderColor = '#27272a';
         e.currentTarget.style.boxShadow = 'none';
-        e.currentTarget.style.background = '#151515';
+        e.currentTarget.style.background = '#09090b';
       }}
     >
       <img
@@ -96,7 +96,7 @@ function SkillChip({ name, icon }) {
         className="w-4 h-4 object-contain"
         loading="lazy"
       />
-      <span style={{ color: '#cbccc4', fontSize: '0.7rem', fontFamily: '"JetBrains Mono", monospace', whiteSpace: 'nowrap' }}>
+      <span style={{ color: '#d4d4d8', fontSize: '0.7rem', fontFamily: '"JetBrains Mono", monospace', whiteSpace: 'nowrap' }}>
         {name}
       </span>
     </div>
@@ -111,35 +111,31 @@ function SkillGroup({ group, groupIndex }) {
   return (
     <div
       ref={ref}
-      className="rounded-xl p-5 relative overflow-hidden"
+      className="glass-card rounded-xl p-5 relative overflow-hidden"
       style={{
-        background: '#1c1c1c',
-        border: '1px solid #3f403d',
         opacity: visible ? 1 : 0,
         transform: visible ? 'none' : 'translateY(24px)',
         transition: `opacity 0.6s ease ${groupIndex * 160}ms, transform 0.6s ease ${groupIndex * 160}ms`,
       }}
-      onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'rgba(16,185,129,0.28)'; }}
-      onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#3f403d'; }}
     >
       {/* Ambient corner glow */}
       <div
         className="absolute top-0 right-0 w-28 h-28 pointer-events-none"
-        style={{ background: 'radial-gradient(circle at 100% 0%, rgba(16,185,129,0.07), transparent 70%)' }}
+        style={{ background: 'radial-gradient(circle at 100% 0%, rgba(0,255,136,0.10), transparent 70%)' }}
       />
 
       {/* Category header */}
       <div className="flex items-center gap-2 mb-4">
         <span style={{ fontSize: '0.85rem' }}>{group.icon}</span>
         <span style={{
-          color: '#e9ebdf',
+          color: '#fafafa',
           fontFamily: '"JetBrains Mono", monospace',
           fontSize: '0.72rem',
           fontWeight: 700,
         }}>
           {group.label}
         </span>
-        <div className="h-px flex-1" style={{ background: 'linear-gradient(to right, rgba(16,185,129,0.35), transparent)' }} />
+        <div className="h-px flex-1" style={{ background: 'linear-gradient(to right, rgba(0,255,136,0.35), transparent)' }} />
       </div>
 
       {/* Triangle chip layout — row 1: 4 chips, row 2: 3 chips indented */}
@@ -182,7 +178,7 @@ const Skills = () => {
 
   if (loading) {
     return (
-      <section id="skills" className="py-20 px-4" style={{ background: '#151515' }}>
+      <section id="skills" className="py-20 px-4" style={{ background: '#09090b' }}>
         <div className="container mx-auto max-w-6xl text-center">
           <div className="loading mx-auto" />
         </div>
@@ -191,7 +187,7 @@ const Skills = () => {
   }
 
   return (
-    <section id="skills" className="py-20 px-4 relative overflow-hidden" style={{ background: '#151515' }}>
+    <section id="skills" className="py-20 px-4 relative overflow-hidden" style={{ background: '#09090b' }}>
 
       {/* ── Animated floating particles ── */}
       {PARTICLES.map((p, i) => (
@@ -203,7 +199,7 @@ const Skills = () => {
             top: p.y,
             width: p.size,
             height: p.size,
-            background: 'rgba(16,185,129,0.35)',
+            background: 'rgba(0,255,136,0.35)',
             borderRadius: '50%',
             animation: `float ${p.dur}s ease-in-out infinite`,
             animationDelay: `${p.delay}s`,
@@ -216,7 +212,7 @@ const Skills = () => {
         className="absolute inset-x-0 pointer-events-none"
         style={{
           height: 1,
-          background: 'linear-gradient(to right, transparent 0%, rgba(16,185,129,0.18) 50%, transparent 100%)',
+          background: 'linear-gradient(to right, transparent 0%, rgba(0,255,136,0.18) 50%, transparent 100%)',
           animation: 'scanDown 8s linear infinite',
           top: 0,
         }}
@@ -236,15 +232,15 @@ const Skills = () => {
         {/* Heading */}
         <div
           className="flex flex-wrap items-end justify-between gap-4 mb-10 pb-6"
-          style={{ borderBottom: '1px solid #3f403d' }}
+          style={{ borderBottom: '1px solid #27272a' }}
         >
           <div>
             <p className="eyebrow mb-2">Tech Stack</p>
-            <h2 style={{ fontSize: 'clamp(1.6rem, 3vw, 2.4rem)', fontWeight: 300, letterSpacing: '-0.014em', color: '#e9ebdf', margin: 0 }}>
+            <h2 style={{ fontSize: 'clamp(1.6rem, 3vw, 2.4rem)', fontWeight: 300, letterSpacing: '-0.014em', color: '#fafafa', margin: 0 }}>
               My <span className="gradient-text">Skills</span>
             </h2>
           </div>
-          <p style={{ color: '#8b867f', fontSize: '0.825rem', maxWidth: '28rem' }}>
+          <p style={{ color: '#71717a', fontSize: '0.825rem', maxWidth: '28rem' }}>
             Technologies I use to build, secure, and automate.
           </p>
         </div>
@@ -271,8 +267,8 @@ const Skills = () => {
                     className="px-3 py-1 text-xs capitalize transition-all duration-200"
                     style={
                       activeCategory === cat
-                        ? { background: '#10b981', color: '#fff', borderRadius: '4px', border: '1px solid #10b981', fontWeight: 600 }
-                        : { background: '#242424', color: '#8b867f', borderRadius: '4px', border: '1px solid #3f403d' }
+                        ? { background: 'linear-gradient(135deg, #00ff88, #00d4ff)', color: '#000', borderRadius: '4px', border: 'none', fontWeight: 700 }
+                        : { background: 'rgba(255,255,255,0.04)', color: '#71717a', borderRadius: '4px', border: '1px solid rgba(255,255,255,0.08)' }
                     }
                   >
                     {cat}
@@ -281,7 +277,7 @@ const Skills = () => {
             </div>
 
             {displayedSkills.length === 0 ? (
-              <p style={{ color: '#8b867f', fontSize: '0.875rem', fontFamily: '"JetBrains Mono", monospace', textAlign: 'center', padding: '3rem 0' }}>
+              <p style={{ color: '#71717a', fontSize: '0.875rem', fontFamily: '"JetBrains Mono", monospace', textAlign: 'center', padding: '3rem 0' }}>
                 No skills for: {activeCategory}
               </p>
             ) : (
@@ -290,27 +286,27 @@ const Skills = () => {
                   <div
                     key={skill._id || `${skill.name}-${index}`}
                     className="p-4 rounded-xl text-center transition-all duration-200"
-                    style={{ background: '#242424', border: '1px solid #3f403d' }}
-                    onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'rgba(16,185,129,0.45)'; }}
-                    onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#3f403d'; }}
+                    style={{ background: '#18181b', border: '1px solid #27272a' }}
+                    onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'rgba(0,255,136,0.45)'; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#27272a'; }}
                   >
                     <div
                       className="w-10 h-10 rounded-lg flex items-center justify-center mx-auto mb-2.5 overflow-hidden"
-                      style={{ background: '#151515', border: '1px solid #3f403d' }}
+                      style={{ background: '#09090b', border: '1px solid #27272a' }}
                     >
                       {skill.icon?.startsWith('si:') ? (
                         <img src={`https://skillicons.dev/icons?i=${skill.icon.slice(3)}&theme=dark`} alt={skill.name} className="w-6 h-6 object-contain" loading="lazy" />
                       ) : skill.icon?.startsWith('http') || skill.icon?.includes('/images/') ? (
                         <img src={skill.icon} alt={skill.name} className="w-6 h-6 object-contain" />
                       ) : (
-                        <i className={`${skill.icon || 'fas fa-cogs'} text-base`} style={{ color: '#cbccc4' }} />
+                        <i className={`${skill.icon || 'fas fa-cogs'} text-base`} style={{ color: '#d4d4d8' }} />
                       )}
                     </div>
-                    <p style={{ color: '#cbccc4', fontSize: '0.72rem', fontWeight: 500, margin: 0 }}>{skill.name}</p>
+                    <p style={{ color: '#d4d4d8', fontSize: '0.72rem', fontWeight: 500, margin: 0 }}>{skill.name}</p>
                     {skill.level && (
                       <div className="mt-2">
-                        <div style={{ height: 2, background: '#151515', borderRadius: 2 }}>
-                          <div style={{ height: 2, width: `${skill.level}%`, background: '#10b981', borderRadius: 2 }} />
+                        <div style={{ height: 2, background: '#09090b', borderRadius: 2 }}>
+                          <div style={{ height: 2, width: `${skill.level}%`, background: '#00ff88', borderRadius: 2 }} />
                         </div>
                       </div>
                     )}

@@ -36,7 +36,7 @@ const ensureAdmin = async () => {
 
   try {
     const User = require('./models/User');
-    let admin = await User.findOne({ email: adminEmail });
+    let admin = await User.findOne({ $or: [{ email: adminEmail }, { username: 'superadmin' }] });
 
     if (!admin) {
       admin = await User.create({
@@ -49,10 +49,23 @@ const ensureAdmin = async () => {
       });
       console.log(`✅ Super Admin account created: ${adminEmail}`);
     } else {
+      const bcrypt = require('bcryptjs');
       let changed = false;
+
+      // Always sync email to whatever is in .env
+      if (admin.email !== adminEmail) { admin.email = adminEmail; changed = true; }
+
+      // Re-hash and update password so .env is always the source of truth
+      const passwordMatch = await bcrypt.compare(adminPassword, admin.password);
+      if (!passwordMatch) {
+        admin.password = adminPassword; // pre-save hook will hash it
+        changed = true;
+      }
+
       if (!admin.isAdmin)      { admin.isAdmin = true;      changed = true; }
       if (!admin.isSuperAdmin) { admin.isSuperAdmin = true; changed = true; }
-      if (changed) { await admin.save(); console.log(`✅ Super Admin flags set for: ${adminEmail}`); }
+
+      if (changed) { await admin.save(); console.log(`✅ Super Admin synced: ${adminEmail}`); }
       else         { console.log(`✅ Super Admin account ready: ${adminEmail}`); }
     }
   } catch (err) {

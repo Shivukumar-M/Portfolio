@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './store/AuthContext.jsx';
 import { ThemeProvider } from './store/ThemeContext.jsx';
@@ -52,6 +52,8 @@ const GuestRoute = ({ children }) => {
 
 function App() {
   const [loading, setLoading] = useState(true);
+  const cursorRef = useRef(null);
+  const followerRef = useRef(null);
 
   useEffect(() => {
     const timer = setTimeout(() => setLoading(false), 1500);
@@ -60,6 +62,28 @@ function App() {
     }
     return () => clearTimeout(timer);
   }, []);
+
+  useEffect(() => {
+    const cursor = cursorRef.current;
+    const follower = followerRef.current;
+    if (!cursor || !follower) return;
+    const move = (e) => {
+      cursor.style.left = `${e.clientX}px`;
+      cursor.style.top = `${e.clientY}px`;
+      follower.style.left = `${e.clientX}px`;
+      follower.style.top = `${e.clientY}px`;
+    };
+    const enter = () => { cursor.style.transform = 'translate(-50%,-50%) scale(1.6)'; };
+    const leave = () => { cursor.style.transform = 'translate(-50%,-50%) scale(1)'; };
+    document.addEventListener('mousemove', move);
+    document.querySelectorAll('a, button').forEach((el) => {
+      el.addEventListener('mouseenter', enter);
+      el.addEventListener('mouseleave', leave);
+    });
+    return () => {
+      document.removeEventListener('mousemove', move);
+    };
+  }, [loading]);
 
   if (loading) {
     return (
@@ -76,6 +100,10 @@ function App() {
     <ThemeProvider>
       <AuthProvider>
         <Router>
+          {/* Custom cursor */}
+          <div ref={cursorRef} className="custom-cursor" />
+          <div ref={followerRef} className="cursor-follower" />
+
           <div className="min-h-screen bg-night-sky relative">
             <div className="fixed inset-0 overflow-hidden pointer-events-none">
               <div className="blob absolute top-20 right-20 w-96 h-96" style={{ opacity: 0.04 }} />

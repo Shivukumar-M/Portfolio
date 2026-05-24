@@ -2,14 +2,56 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../store/AuthContext.jsx';
 import axios from 'axios';
 
+const ContactInfoItem = ({ icon, label, value }) => (
+  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.875rem' }}>
+    <div
+      style={{
+        width: 36,
+        height: 36,
+        borderRadius: 8,
+        background: '#18181b',
+        border: '1px solid #27272a',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        flexShrink: 0,
+      }}
+    >
+      <i className={icon} style={{ color: '#00ff88', fontSize: '0.8rem' }} />
+    </div>
+    <div>
+      <p style={{ margin: '0 0 0.125rem', fontSize: '0.75rem', color: '#71717a', fontFamily: 'Inter, sans-serif' }}>{label}</p>
+      <p style={{ margin: 0, fontSize: '0.875rem', color: '#d4d4d8', fontFamily: 'Inter, sans-serif', fontWeight: 500 }}>{value}</p>
+    </div>
+  </div>
+);
+
+const inputStyle = {
+  width: '100%',
+  padding: '0.5625rem 0.75rem',
+  background: 'transparent',
+  border: '1px solid #27272a',
+  borderRadius: 8,
+  fontFamily: 'Inter, sans-serif',
+  fontSize: '0.875rem',
+  color: '#fafafa',
+  outline: 'none',
+  boxSizing: 'border-box',
+  transition: 'border-color 0.15s ease, box-shadow 0.15s ease',
+};
+
+const focusInput = (e) => {
+  e.target.style.borderColor = '#00ff88';
+  e.target.style.boxShadow = '0 0 0 3px rgba(16, 185, 129, 0.15)';
+};
+const blurInput = (e) => {
+  e.target.style.borderColor = '#27272a';
+  e.target.style.boxShadow = 'none';
+};
+
 const Contact = () => {
   const { isAuthenticated, user } = useAuth();
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    subject: '',
-    message: ''
-  });
+  const [formData, setFormData] = useState({ name: '', email: '', subject: '', message: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState(null);
   const [contactData, setContactData] = useState(null);
@@ -18,231 +60,274 @@ const Contact = () => {
     const fetchContact = async () => {
       try {
         if (isAuthenticated && user) {
-          // Fetch logged-in user's contact info
           const token = localStorage.getItem('token');
-          const headers = { Authorization: `Bearer ${token}` };
-          const res = await axios.get('/api/contact', { headers });
+          const res = await axios.get('/api/contact', { headers: { Authorization: `Bearer ${token}` } });
           setContactData(res.data);
         } else {
-          // Not authenticated — use hardcoded defaults
           setContactData({
-            email: 'shivukumar@example.com',
+            email: 'shivukumarlearn7@gmail.com',
             phone: '+91 98765 43210',
             location: 'Bengaluru, Karnataka, India',
           });
         }
-      } catch (error) {
-        console.error('Error fetching contact:', error);
-        // Set default contact if fetch fails
+      } catch {
         setContactData({
-          email: 'your.email@example.com',
-          phone: '+1 (123) 456-7890',
-          location: 'Your City, Country',
+          email: 'shivukumarlearn7@gmail.com',
+          phone: '+91 98765 43210',
+          location: 'Bengaluru, Karnataka, India',
         });
       }
     };
-
     fetchContact();
   }, [isAuthenticated, user]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prevData => ({
-      ...prevData,
-      [name]: value
-    }));
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-    
     try {
-      const response = await axios.post('/api/messages', {
-        ...formData,
-        userId: user?._id || 'public'
-      });
+      const response = await axios.post('/api/messages', { ...formData, userId: user?._id || 'public' });
       setSubmitStatus({ success: true, message: response.data.message });
-      setFormData({
-        name: '',
-        email: '',
-        subject: '',
-        message: ''
-      });
+      setFormData({ name: '', email: '', subject: '', message: '' });
     } catch (error) {
-      setSubmitStatus({ 
-        success: false, 
-        message: error.response?.data?.message || 'Failed to send message. Please try again.' 
+      setSubmitStatus({
+        success: false,
+        message: error.response?.data?.message || 'Failed to send message. Please try again.',
       });
     } finally {
       setIsSubmitting(false);
-      
-      setTimeout(() => {
-        setSubmitStatus(null);
-      }, 5000);
+      setTimeout(() => setSubmitStatus(null), 5000);
     }
   };
 
   if (!contactData) {
     return (
-      <section id="contact" className="py-20 px-4">
-        <div className="container mx-auto max-w-4xl">
-          <div className="text-center">
-            <div className="loading mx-auto mb-4"></div>
-            <p className="text-slate-400">Loading Contact Information...</p>
-          </div>
+      <section id="contact" style={{ padding: '5rem 1.5rem', background: '#09090b' }}>
+        <div style={{ maxWidth: 900, margin: '0 auto', textAlign: 'center' }}>
+          <div className="loading" style={{ margin: '0 auto' }} />
         </div>
       </section>
     );
   }
 
   return (
-    <section id="contact" className="py-20 px-4">
-      <div className="container mx-auto max-w-4xl">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            Get In <span className="gradient-text">Touch</span>
+    <section id="contact" style={{ padding: '5rem 1.5rem', background: '#09090b' }}>
+      <div style={{ maxWidth: 900, margin: '0 auto' }}>
+
+        {/* Heading */}
+        <div style={{ marginBottom: '3rem' }}>
+          <p className="eyebrow" style={{ marginBottom: '0.625rem' }}>Contact</p>
+          <h2
+            style={{
+              margin: '0 0 0.75rem',
+              fontSize: 'clamp(1.75rem, 3.5vw, 2.5rem)',
+              fontWeight: 600,
+              color: '#fafafa',
+              letterSpacing: '-0.022em',
+              fontFamily: 'Inter, sans-serif',
+            }}
+          >
+            Get in <span className="gradient-text">touch</span>
           </h2>
-          <p className="text-slate-400 max-w-2xl mx-auto">
-            Feel free to reach out to me for any questions, opportunities, or just to say hello!
+          <p style={{ margin: 0, fontSize: '0.9375rem', color: '#71717a', maxWidth: '38rem', lineHeight: 1.7 }}>
+            Feel free to reach out for opportunities, collaborations, or just to say hello.
           </p>
         </div>
-        
-        <div className="grid md:grid-cols-2 gap-12">
-          <div>
-            <h3 className="text-2xl font-semibold mb-6 text-white">Let's Connect</h3>
-            <p className="text-slate-300 mb-8">
-              I'm always interested in hearing about new opportunities and exciting projects. 
-              Whether you have a question or just want to say hi, feel free to reach out!
-            </p>
-            
-            <div className="space-y-4">
-              <div className="flex items-center space-x-4">
-                <div className="w-12 h-12 bg-blue-500 rounded-lg flex items-center justify-center">
-                  <i className="fas fa-envelope text-white"></i>
-                </div>
-                <div>
-                  <p className="text-slate-400 text-sm">Email</p>
-                  <p className="text-white">{contactData.email}</p>
-                </div>
-              </div>
-              
-              <div className="flex items-center space-x-4">
-                <div className="w-12 h-12 bg-blue-500 rounded-lg flex items-center justify-center">
-                  <i className="fas fa-phone text-white"></i>
-                </div>
-                <div>
-                  <p className="text-slate-400 text-sm">Phone</p>
-                  <p className="text-white">{contactData.phone}</p>
-                </div>
-              </div>
-              
-              <div className="flex items-center space-x-4">
-                <div className="w-12 h-12 bg-blue-500 rounded-lg flex items-center justify-center">
-                  <i className="fas fa-map-marker-alt text-white"></i>
-                </div>
-                <div>
-                  <p className="text-slate-400 text-sm">Location</p>
-                  <p className="text-white">{contactData.location}</p>
-                </div>
-              </div>
+
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+            gap: '2rem',
+            alignItems: 'start',
+          }}
+        >
+          {/* Contact info */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+            <div>
+              <h3 style={{ margin: '0 0 0.5rem', fontSize: '1rem', fontWeight: 600, color: '#fafafa', letterSpacing: '-0.01em' }}>
+                Let's connect
+              </h3>
+              <p style={{ margin: 0, fontSize: '0.875rem', color: '#71717a', lineHeight: 1.7 }}>
+                I'm always open to new projects and interesting conversations.
+              </p>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              <ContactInfoItem icon="fas fa-envelope" label="Email" value={contactData.email} />
+              <ContactInfoItem icon="fas fa-phone" label="Phone" value={contactData.phone} />
+              <ContactInfoItem icon="fas fa-location-dot" label="Location" value={contactData.location} />
+            </div>
+
+            {/* Social row */}
+            <div style={{ display: 'flex', gap: '0.5rem', paddingTop: '0.5rem', borderTop: '1px solid #27272a' }}>
+              {[
+                { icon: 'fab fa-github', href: 'https://github.com/Shivukumar-M', label: 'GitHub' },
+                { icon: 'fab fa-linkedin', href: 'https://www.linkedin.com/in/shivu-kumar-a-m', label: 'LinkedIn' },
+              ].map(({ icon, href, label }) => (
+                <a
+                  key={label}
+                  href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={label}
+                  style={{
+                    width: 36,
+                    height: 36,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    borderRadius: 8,
+                    background: '#18181b',
+                    border: '1px solid #27272a',
+                    color: '#71717a',
+                    textDecoration: 'none',
+                    fontSize: '0.875rem',
+                    transition: 'color 0.15s ease, border-color 0.15s ease',
+                  }}
+                  onMouseEnter={(e) => { e.currentTarget.style.color = '#00ff88'; e.currentTarget.style.borderColor = 'rgba(0,255,136,0.4)'; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.color = '#71717a'; e.currentTarget.style.borderColor = '#27272a'; }}
+                >
+                  <i className={icon} />
+                </a>
+              ))}
             </div>
           </div>
-          
-          <div>
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div>
-                <label htmlFor="name" className="block text-sm font-medium text-slate-300 mb-2">
-                  Your Name
-                </label>
+
+          {/* Contact form */}
+          <div
+            style={{
+              background: '#18181b',
+              border: '1px solid #27272a',
+              borderRadius: 14,
+              padding: '1.5rem',
+            }}
+          >
+            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+
+              {/* Name + Email row */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
+                  <label style={{ fontSize: '0.8rem', fontWeight: 500, color: '#d4d4d8' }}>Name</label>
+                  <input
+                    type="text"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleChange}
+                    required
+                    placeholder="Shivu Kumar"
+                    style={inputStyle}
+                    onFocus={focusInput}
+                    onBlur={blurInput}
+                  />
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
+                  <label style={{ fontSize: '0.8rem', fontWeight: 500, color: '#d4d4d8' }}>Email</label>
+                  <input
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    required
+                    placeholder="you@example.com"
+                    style={inputStyle}
+                    onFocus={focusInput}
+                    onBlur={blurInput}
+                  />
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
+                <label style={{ fontSize: '0.8rem', fontWeight: 500, color: '#d4d4d8' }}>Subject</label>
                 <input
                   type="text"
-                  id="name"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleChange}
-                  required
-                  className="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:border-blue-500 text-white transition-colors duration-300"
-                  placeholder="Shivu Kumar"
-                />
-              </div>
-              
-              <div>
-                <label htmlFor="email" className="block text-sm font-medium text-slate-300 mb-2">
-                  Your Email
-                </label>
-                <input
-                  type="email"
-                  id="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  required
-                  className="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:border-blue-500 text-white transition-colors duration-300"
-                  placeholder="dark@example.com"
-                />
-              </div>
-              
-              <div>
-                <label htmlFor="subject" className="block text-sm font-medium text-slate-300 mb-2">
-                  Subject
-                </label>
-                <input
-                  type="text"
-                  id="subject"
                   name="subject"
                   value={formData.subject}
                   onChange={handleChange}
                   required
-                  className="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:border-blue-500 text-white transition-colors duration-300"
-                  placeholder="Project Inquiry"
+                  placeholder="Project inquiry"
+                  style={inputStyle}
+                  onFocus={focusInput}
+                  onBlur={blurInput}
                 />
               </div>
-              
-              <div>
-                <label htmlFor="message" className="block text-sm font-medium text-slate-300 mb-2">
-                  Message
-                </label>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
+                <label style={{ fontSize: '0.8rem', fontWeight: 500, color: '#d4d4d8' }}>Message</label>
                 <textarea
-                  id="message"
                   name="message"
                   value={formData.message}
                   onChange={handleChange}
                   required
-                  rows="5"
-                  className="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:border-blue-500 text-white resize-none transition-colors duration-300"
-                  placeholder="Your message here..."
-                ></textarea>
+                  rows={5}
+                  placeholder="Tell me about your project…"
+                  style={{ ...inputStyle, height: 'auto', resize: 'vertical', padding: '0.625rem 0.75rem' }}
+                  onFocus={focusInput}
+                  onBlur={blurInput}
+                />
               </div>
-              
+
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '0.5rem',
+                  width: '100%',
+                  height: '2.375rem',
+                  background: '#00ff88',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: 8,
+                  fontFamily: 'Inter, sans-serif',
+                  fontWeight: 500,
+                  fontSize: '0.875rem',
+                  cursor: isSubmitting ? 'not-allowed' : 'pointer',
+                  opacity: isSubmitting ? 0.75 : 1,
+                  transition: 'opacity 0.15s ease',
+                }}
               >
                 {isSubmitting ? (
-                  <span className="flex items-center justify-center">
-                    <i className="fas fa-spinner fa-spin mr-2"></i>
-                    Sending...
-                  </span>
+                  <>
+                    <div style={{ width: 14, height: 14, border: '2px solid rgba(255,255,255,0.3)', borderTopColor: '#fff', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
+                    Sending…
+                  </>
                 ) : (
-                  <span className="flex items-center justify-center">
-                    <i className="fas fa-paper-plane mr-2"></i>
-                    Send Message
-                  </span>
+                  <>
+                    <i className="fas fa-paper-plane" style={{ fontSize: '0.8rem' }} />
+                    Send message
+                  </>
                 )}
               </button>
+
+              {submitStatus && (
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    gap: '0.625rem',
+                    padding: '0.75rem',
+                    borderRadius: 8,
+                    background: submitStatus.success ? 'rgba(16, 185, 129, 0.08)' : 'rgba(239, 68, 68, 0.08)',
+                    border: `1px solid ${submitStatus.success ? 'rgba(0,255,136,0.25)' : 'rgba(239,68,68,0.25)'}`,
+                  }}
+                >
+                  <i
+                    className={`fas ${submitStatus.success ? 'fa-circle-check' : 'fa-circle-exclamation'}`}
+                    style={{ color: submitStatus.success ? '#00ff88' : '#ef4444', fontSize: '0.8rem', marginTop: 2 }}
+                  />
+                  <p style={{ margin: 0, fontSize: '0.8125rem', color: submitStatus.success ? '#6ee7b7' : '#fca5a5' }}>
+                    {submitStatus.message}
+                  </p>
+                </div>
+              )}
             </form>
-            
-            {submitStatus && (
-              <div className={`mt-4 p-4 rounded-lg border ${
-                submitStatus.success 
-                  ? 'bg-green-900/20 border-green-500/30 text-green-400' 
-                  : 'bg-red-900/20 border-red-500/30 text-red-400'
-              }`}>
-                {submitStatus.success ? '✓' : '✗'} {submitStatus.message}
-              </div>
-            )}
           </div>
         </div>
       </div>
